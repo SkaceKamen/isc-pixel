@@ -200,4 +200,5 @@ const StyledCanvas = styled.canvas`
 	image-rendering: -o-crisp-edges;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
+	cursor: crosshair;
 `
