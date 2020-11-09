@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>App</title>
+
+		<style>
+			body {
+				background: #eee;
+			}
+
+			.image, canvas {
+				image-rendering: optimizeSpeed;
+				-ms-interpolation-mode: nearest-neighbor;
+				image-rendering: -webkit-optimize-contrast;
+				image-rendering: -webkit-crisp-edges;
+				image-rendering: -moz-crisp-edges;
+				image-rendering: -o-crisp-edges;
+				image-rendering: pixelated;
+				image-rendering: crisp-edges;
+
+				transform: scale(10);
+			}
+		</style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+		<div id="application"></div>
+
+		<script type="text/javascript">
+			$s = document.querySelector.bind(document)
+
+			const intToRGBA = function(i) {
+				if (typeof i !== 'number') {
+					return throwError.call(this, 'i must be a number', cb);
+				}
+
+				const rgba = {};
+
+				rgba.r = Math.floor(i / Math.pow(256, 3));
+				rgba.g = Math.floor((i - rgba.r * Math.pow(256, 3)) / Math.pow(256, 2));
+				rgba.b = Math.floor(
+					(i - rgba.r * Math.pow(256, 3) - rgba.g * Math.pow(256, 2)) /
+						Math.pow(256, 1)
+				);
+				rgba.a = Math.floor(
+					(i -
+						rgba.r * Math.pow(256, 3) -
+						rgba.g * Math.pow(256, 2) -
+						rgba.b * Math.pow(256, 1)) /
+						Math.pow(256, 0)
+				);
+
+				return rgba;
+			};
+
+			const canvas = document.createElement('canvas')
+			const ctx = canvas.getContext('2d')
+			canvas.width = 512
+			canvas.height = 512
+
+			const image = document.createElement('img')
+			image.src = '/canvas/image.png'
+			image.className = 'image'
+			image.onload = () => {
+				ctx.drawImage(image, 0, 0)
+			}
+
+			function refresh() {
+				image.src = '/canvas/image.png?t=' + Date.now()
+			}
+
+			const ws = new WebSocket("ws://" + location.host + "/")
+			ws.onmessage = (e) => {
+				const data = JSON.parse(e.data)
+				if (data.pixel) {
+					const color = intToRGBA(data.pixel.color * 0x100 + 0xff)
+					const id = ctx.createImageData(1,1);
+					const d = id.data;
+					d[0] = color.r;
+					d[1] = color.g;
+					d[2] = color.b;
+					d[3] = 255;
+					ctx.putImageData( id, data.pixel.x, data.pixel.y);     
+				}
+			}
+
+			canvas.addEventListener('click', (e) => {
+				const rect = e.target.getBoundingClientRect();
+				const x = e.clientX - rect.left;
+				const y = e.clientY - rect.top;
+
+				fetch('/pixel', {
+					method: 'PUT',
+					headers: {
+						'Content-type': 'application/json'
+					},
+					body: JSON.stringify({
+						x: Math.floor(x/10), y: Math.floor(y/10), color: 0x000000
+					})
+				}) //.then(refresh)
+			})
+
+			$s("#application").appendChild(canvas)
+		</script>
+  </body>
+</html> 
