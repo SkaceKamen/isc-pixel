@@ -7,9 +7,11 @@ import { setApiState } from '@/store/modules/api'
 import { useAppDispatch } from '@/utils/hooks'
 import React, { useEffect, useState } from 'react'
 
-type Props = {}
+type Props = {
+	onClose: () => void
+}
 
-export const SessionModal = ({}: Props) => {
+export const SessionModal = ({ onClose }: Props) => {
 	const rest = useRest()
 	const dispatch = useAppDispatch()
 
@@ -35,8 +37,8 @@ export const SessionModal = ({}: Props) => {
 			results
 		})
 
-		if (res.session) {
-			dispatch(setApiState({ session: res.session }))
+		if (res.session && res.pixels !== undefined) {
+			dispatch(setApiState({ session: res.session, sessionPixels: res.pixels }))
 		} else {
 			await loadSession()
 		}
@@ -49,14 +51,17 @@ export const SessionModal = ({}: Props) => {
 	}, [])
 
 	return (
-		<Modal open={true}>
+		<Modal open={true} onClose={onClose}>
 			<Loader loaded={!loading} />
 			{captcha && (
-				<Kaptcha
-					baseUrl={`${getRestUrl()}/captcha/`}
-					id={captcha}
-					onFinish={handleFinish}
-				/>
+				<>
+					<p>Solve this puzzle</p>
+					<Kaptcha
+						baseUrl={`${getRestUrl()}/captcha/`}
+						id={captcha}
+						onFinish={handleFinish}
+					/>
+				</>
 			)}
 		</Modal>
 	)

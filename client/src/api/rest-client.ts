@@ -1,7 +1,8 @@
 import {
 	CanvasInfo,
 	CaptchaFinishRequest,
-	CaptchaFinishResponse
+	CaptchaFinishResponse,
+	PixelResponse
 } from '@shared/rest'
 
 export class RestClient {
@@ -19,8 +20,8 @@ export class RestClient {
 		return (await res.json()) as CanvasInfo
 	}
 
-	putPixel(x: number, y: number, color: number) {
-		return fetch(`${this.url}/pixel`, {
+	async putPixel(x: number, y: number, color: number) {
+		const res = await fetch(`${this.url}/pixel`, {
 			method: 'PUT',
 			headers: {
 				'Content-type': 'application/json',
@@ -28,6 +29,8 @@ export class RestClient {
 			},
 			body: JSON.stringify({ x, y, color })
 		})
+
+		return (await res.json()) as PixelResponse
 	}
 
 	async requestSession() {

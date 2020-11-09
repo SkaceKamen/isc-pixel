@@ -36,7 +36,7 @@ export const Kaptcha = ({ baseUrl = '', id, steps = 2, onFinish }: Props) => {
 	return step < steps ? (
 		<>
 			<div>
-				Step {step} / {steps}
+				Step {step + 1} / {steps}
 			</div>
 			<div>
 				Find this letter:{' '}

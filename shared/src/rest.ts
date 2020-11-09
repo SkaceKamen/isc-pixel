@@ -7,6 +7,7 @@ export type CanvasInfo = {
 export type CaptchaFinishResponse = {
 	ok: boolean
 	session?: string
+	pixels?: number
 }
 
 export type CaptchaFinishRequest = {
@@ -15,4 +16,11 @@ export type CaptchaFinishRequest = {
 		x: number
 		y: number
 	}[]
+}
+
+export type PixelResponse = {
+	id: string
+	pixels: number
+	expiresAt: string
+	reloadsAt?: string
 }

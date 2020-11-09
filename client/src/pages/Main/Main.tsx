@@ -23,7 +23,7 @@ export const Main = ({}: Props) => {
 		if (e.deltaY > 0) {
 			setZoom(zoom => Math.max(0.1, zoom * 0.85))
 		} else {
-			setZoom(zoom => Math.min(10, zoom * 1.25))
+			setZoom(zoom => Math.min(20, zoom * 1.25))
 		}
 	})
 

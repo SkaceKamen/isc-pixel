@@ -1,9 +1,13 @@
 import { getRestUrl } from '@/api/utils'
 import { useRest } from '@/context/RestContext'
 import { useWs } from '@/context/WsContext'
+import { setApiState } from '@/store/modules/api'
 import { intToRGBA } from '@/utils/color'
+import { relativeMousePosition } from '@/utils/dom'
+import { useAppDispatch, useAppStore } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
 import { Pixel } from '@shared/ws'
+import { off } from 'process'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
@@ -16,10 +20,18 @@ type Props = {
 export const PaintCanvas = ({ info, zoom, color }: Props) => {
 	const rest = useRest()
 	const ws = useWs()
+	const dispatch = useAppDispatch()
+	const pixels = useAppStore(state => state.api.sessionPixels)
 
 	const dragRef = useRef({
 		dragging: false,
 		start: { x: 0, y: 0 }
+	})
+
+	const mouseRef = useRef({
+		x: 0,
+		y: 0,
+		zoom
 	})
 
 	const [offset, setOffset] = useState({
@@ -27,14 +39,30 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 		y: 0
 	})
 
+	const [actualZoom, setActualZoom] = useState(zoom)
+
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 
-	const handleClick = (e: React.MouseEvent) => {
-		const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
-		const x = Math.floor(((e.clientX - rect.left) * 1) / zoom)
-		const y = Math.floor(((e.clientY - rect.top) * 1) / zoom)
+	const handleClick = async (e: React.MouseEvent) => {
+		if (pixels <= 0) {
+			return
+		}
 
-		rest.putPixel(x, y, parseInt(color.slice(1), 16))
+		const pos = relativeMousePosition(e)
+		const x = Math.floor(pos.x / zoom)
+		const y = Math.floor(pos.y / zoom)
+
+		const res = await rest.putPixel(x, y, parseInt(color.slice(1), 16))
+
+		dispatch(
+			setApiState({
+				session: res.id,
+				sessionPixels: res.pixels,
+				sessionPixelsReloadAt: res.reloadsAt
+					? new Date(res.reloadsAt)
+					: undefined
+			})
+		)
 	}
 
 	const handleMouseDown = (e: React.MouseEvent) => {
@@ -62,6 +90,16 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 	}
 
 	const handleMouseMove = (e: React.MouseEvent) => {
+		const pos = relativeMousePosition(e)
+		const x = Math.floor(pos.x / zoom)
+		const y = Math.floor(pos.y / zoom)
+
+		mouseRef.current = {
+			...mouseRef.current,
+			x,
+			y
+		}
+
 		if (dragRef.current.dragging) {
 			setOffset({
 				x: e.clientX - dragRef.current.start.x,
@@ -114,12 +152,26 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 		}
 	}, [handlePixel])
 
+	useEffect(() => {
+		const mouse = mouseRef.current
+		const diff = zoom - mouse.zoom
+
+		mouse.zoom = zoom
+
+		setOffset({
+			x: offset.x + (info.width / 2 - mouse.x) * diff,
+			y: offset.y + (info.height / 2 - mouse.y) * diff
+		})
+
+		setActualZoom(zoom)
+	}, [zoom])
+
 	return (
 		<CanvasContainer
 			style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
 		>
 			<StyledCanvas
-				style={{ transform: `scale(${zoom})` }}
+				style={{ transform: `scale(${actualZoom})` }}
 				ref={canvasRef}
 				onClick={handleClick}
 				onMouseDown={handleMouseDown}

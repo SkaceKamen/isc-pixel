@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { hours } from './lib/time'
+import { hours, minutes } from './lib/time'
 
 export type Session = {
 	id: string
@@ -29,14 +29,19 @@ export class Sessions {
 		return this.items[id]
 	}
 
-	async prolong(id: string) {
+	async pixelUsed(id: string) {
 		const session = await this.get(id)
 
 		if (!session) {
 			throw new Error(`Invalid session ${id}`)
 		}
 
+		session.pixels -= 1
 		session.expiresAt = Date.now() + hours(1)
+
+		if (session.reloadsAt === undefined) {
+			session.reloadsAt = Date.now() + minutes(1)
+		}
 	}
 
 	start() {
