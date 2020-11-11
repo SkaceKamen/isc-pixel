@@ -59,4 +59,20 @@ button, a {
 .mr-2 {
 	margin-right: 0.5rem;
 }
+
+.x2-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.pixel-perfect {
+  image-rendering: optimizeSpeed;
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: -webkit-crisp-edges;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
+}
 `

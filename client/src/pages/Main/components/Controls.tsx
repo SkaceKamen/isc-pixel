@@ -1,9 +1,16 @@
-import { setCanvasState } from '@/store/modules/canvas'
+import { CanvasTool, setCanvasState } from '@/store/modules/canvas'
 import { setSessionState } from '@/store/modules/session'
-import { useAppDispatch, useAppStore, useInterval } from '@/utils/hooks'
+import {
+	useAppDispatch,
+	useAppStore,
+	useInterval,
+	useWindowEvent
+} from '@/utils/hooks'
 import React, { useEffect, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 import styled from 'styled-components'
+import pickerIcon from '@/assets/picker-icon.png'
+import paintIcon from '@/assets/paint-icon.png'
 
 type Props = {
 	onSessionRequested: () => void
@@ -15,9 +22,20 @@ export const Controls = ({ onSessionRequested }: Props) => {
 	const pixels = useAppStore(state => state.session.pixels)
 	const reloadsAt = useAppStore(state => state.session.pixelsReloadAt)
 	const color = useAppStore(state => state.canvas.color)
-	const tool = useAppStore(state => state.canvas.tool)
 
 	const [reloadsIn, setReloadsIn] = useState(0)
+
+	useWindowEvent('keydown', (e: KeyboardEvent) => {
+		if (e.key === 'Control') {
+			dispatch(setCanvasState({ tool: CanvasTool.Pick }))
+		}
+	})
+
+	useWindowEvent('keyup', (e: KeyboardEvent) => {
+		if (e.key === 'Control') {
+			dispatch(setCanvasState({ tool: CanvasTool.Paint }))
+		}
+	})
 
 	const updateReload = () => {
 		const reloadsIn = reloadsAt
@@ -47,6 +65,9 @@ export const Controls = ({ onSessionRequested }: Props) => {
 		setCanvasState({ color })
 	}
 
+	const handleTool = (tool: CanvasTool) => () =>
+		dispatch(setCanvasState({ tool }))
+
 	return (
 		<C>
 			{session ? (
@@ -57,6 +78,24 @@ export const Controls = ({ onSessionRequested }: Props) => {
 							<HexColorInput onChange={handleColor} color={color} />
 						</Picker>
 					)}
+					{/*
+					<Tools>
+						<Tool onClick={handleTool(CanvasTool.Paint)}>
+							<img
+								src={paintIcon}
+								className="x2-icon pixel-perfect"
+								alt="Paint tool"
+							/>
+						</Tool>
+						<Tool onClick={handleTool(CanvasTool.Pick)}>
+							<img
+								src={pickerIcon}
+								className="x2-icon pixel-perfect"
+								alt="Pick color (CTRL)"
+							/>
+						</Tool>
+					</Tools>
+					*/}
 					<ButtonsRow>
 						<CurrentColor
 							onClick={togglePicker}
@@ -86,6 +125,12 @@ const C = styled.div`
 	z-index: 1;
 	background: rgb(0, 0, 0, 0.9);
 `
+
+const Tools = styled.div`
+	display: flex;
+`
+
+const Tool = styled.div``
 
 const ButtonsRow = styled.div`
 	display: flex;

@@ -1,14 +1,16 @@
 import { getRestUrl } from '@/api/utils'
 import { useRest } from '@/context/RestContext'
 import { useWs } from '@/context/WsContext'
+import { CanvasTool, setCanvasState } from '@/store/modules/canvas'
 import { setSessionState } from '@/store/modules/session'
-import { intToRGBA } from '@/utils/color'
+import { intToRGBA, rgbToHex } from '@/utils/color'
 import { relativeMousePosition } from '@/utils/dom'
 import { useAppDispatch, useAppStore } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
 import { Pixel } from '@shared/ws'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import pickerIcon from '@/assets/picker-icon.png'
 
 type Props = {
 	info: CanvasInfo
@@ -24,6 +26,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	const session = useAppStore(state => state.session.id)
 	const pixels = useAppStore(state => state.session.pixels)
 	const color = useAppStore(state => state.canvas.color)
+	const tool = useAppStore(state => state.canvas.tool)
 
 	const dragRef = useRef({
 		dragging: false,
@@ -52,23 +55,49 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 			onSessionRequested()
 		}
 
-		if (pixels <= 0) {
-			return
-		}
-
 		const pos = relativeMousePosition(e)
 		const x = Math.floor(pos.x / zoom)
 		const y = Math.floor(pos.y / zoom)
 
-		const res = await rest.putPixel(x, y, parseInt(color.slice(1), 16))
+		switch (tool) {
+			case CanvasTool.Pick: {
+				if (!canvasRef.current) {
+					return
+				}
 
-		dispatch(
-			setSessionState({
-				id: res.id,
-				pixels: res.pixels,
-				pixelsReloadAt: res.reloadsAt ? new Date(res.reloadsAt) : undefined
-			})
-		)
+				const ctx = canvasRef.current.getContext('2d')
+
+				if (!ctx) {
+					throw new Error('Failed to get 2D context')
+				}
+
+				const data = ctx.getImageData(x, y, 1, 1).data
+
+				dispatch(
+					setCanvasState({ color: '#' + rgbToHex(data[0], data[1], data[2]) })
+				)
+
+				break
+			}
+
+			case CanvasTool.Paint: {
+				if (pixels <= 0) {
+					return
+				}
+
+				const res = await rest.putPixel(x, y, parseInt(color.slice(1), 16))
+
+				dispatch(
+					setSessionState({
+						id: res.id,
+						pixels: res.pixels,
+						pixelsReloadAt: res.reloadsAt ? new Date(res.reloadsAt) : undefined
+					})
+				)
+
+				break
+			}
+		}
 	}
 
 	const handleMouseDown = (e: React.MouseEvent) => {
@@ -143,6 +172,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 			canvas.height = info.height
 
 			const image = document.createElement('img')
+			image.crossOrigin = 'anonymous'
 			image.src = `${getRestUrl()}${info.path}?t=${Date.now()}`
 			image.className = 'image'
 
@@ -175,26 +205,58 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	}, [zoom])
 
 	return (
-		<CanvasContainer
-			style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
-		>
-			<StyledCanvas
-				style={{ transform: `scale(${actualZoom})` }}
-				ref={canvasRef}
-				onClick={handleClick}
-				onMouseDown={handleMouseDown}
-				onMouseUp={handleMouseUp}
-				onMouseMove={handleMouseMove}
-				onContextMenu={blockContext}
-			/>
-			<ClickPreview
+		<CanvasContainer>
+			<Translate
 				style={{
-					left: `${(offset.x + mousePos.x) * zoom}px`,
-					top: `${(offset.y + mousePos.y) * zoom}px`,
-					width: `${actualZoom}px`,
-					height: `${actualZoom}px`
+					transform: `translate(${offset.x}px, ${offset.y}px)`,
+					width: info.width,
+					height: info.height
 				}}
-			/>
+			>
+				<Scale
+					style={{
+						transform: `scale(${actualZoom})`,
+						width: info.width,
+						height: info.height
+					}}
+					onClick={handleClick}
+					onMouseDown={handleMouseDown}
+					onMouseUp={handleMouseUp}
+					onMouseMove={handleMouseMove}
+					onContextMenu={blockContext}
+				>
+					<StyledCanvas ref={canvasRef} />
+				</Scale>
+				<ClickPreview
+					style={{
+						transform: `translate(
+							${info.width / 2 + (mousePos.x - info.width / 2) * actualZoom}px,
+							${info.height / 2 + (mousePos.y - info.height / 2) * actualZoom}px)`,
+						width: zoom,
+						height: zoom
+					}}
+				>
+					{tool === CanvasTool.Pick && (
+						<Icon
+							style={{
+								transform: 'translate(-110%,-110%)'
+							}}
+						>
+							<img src={pickerIcon} />
+						</Icon>
+					)}
+					{zoom > 10 && (
+						<Position
+							style={{
+								top: zoom,
+								left: zoom * 1.5
+							}}
+						>
+							{mousePos.x},{mousePos.y}
+						</Position>
+					)}
+				</ClickPreview>
+			</Translate>
 		</CanvasContainer>
 	)
 }
@@ -202,10 +264,23 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 const CanvasContainer = styled.div`
 	width: 100%;
 	height: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
 	position: relative;
+`
+
+const Translate = styled.div`
+	position: relative;
+`
+
+const Scale = styled.div`
+	cursor: crosshair;
+	image-rendering: optimizeSpeed;
+	-ms-interpolation-mode: nearest-neighbor;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: -webkit-crisp-edges;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: pixelated;
+	image-rendering: crisp-edges;
 `
 
 const StyledCanvas = styled.canvas`
@@ -217,10 +292,26 @@ const StyledCanvas = styled.canvas`
 	image-rendering: -o-crisp-edges;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
-	cursor: crosshair;
 `
 
 const ClickPreview = styled.div`
 	position: absolute;
-	background: rgba(0, 0, 0, 0.5);
+	top: 0;
+	left: 0;
+	border: 1px solid #000;
+	pointer-events: none;
+	box-sizing: border-box;
+`
+
+const Position = styled.div`
+	text-shadow: 1px 1px 0 #000;
+	color: #fff;
+	position: absolute;
+	font-size: 8px;
+`
+
+const Icon = styled.div`
+	text-shadow: 1px 1px 0 #000;
+	color: #fff;
+	position: absolute;
 `
