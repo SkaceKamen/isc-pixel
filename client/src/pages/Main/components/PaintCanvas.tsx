@@ -1,27 +1,29 @@
 import { getRestUrl } from '@/api/utils'
 import { useRest } from '@/context/RestContext'
 import { useWs } from '@/context/WsContext'
-import { setApiState } from '@/store/modules/api'
+import { setSessionState } from '@/store/modules/session'
 import { intToRGBA } from '@/utils/color'
 import { relativeMousePosition } from '@/utils/dom'
 import { useAppDispatch, useAppStore } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
 import { Pixel } from '@shared/ws'
-import { off } from 'process'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 type Props = {
 	info: CanvasInfo
 	zoom: number
-	color: string
+	onSessionRequested: () => void
 }
 
-export const PaintCanvas = ({ info, zoom, color }: Props) => {
+export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	const rest = useRest()
 	const ws = useWs()
 	const dispatch = useAppDispatch()
-	const pixels = useAppStore(state => state.api.sessionPixels)
+
+	const session = useAppStore(state => state.session.id)
+	const pixels = useAppStore(state => state.session.pixels)
+	const color = useAppStore(state => state.canvas.color)
 
 	const dragRef = useRef({
 		dragging: false,
@@ -34,6 +36,8 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 		zoom
 	})
 
+	const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+
 	const [offset, setOffset] = useState({
 		x: 0,
 		y: 0
@@ -44,6 +48,10 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 
 	const handleClick = async (e: React.MouseEvent) => {
+		if (!session) {
+			onSessionRequested()
+		}
+
 		if (pixels <= 0) {
 			return
 		}
@@ -55,12 +63,10 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 		const res = await rest.putPixel(x, y, parseInt(color.slice(1), 16))
 
 		dispatch(
-			setApiState({
-				session: res.id,
-				sessionPixels: res.pixels,
-				sessionPixelsReloadAt: res.reloadsAt
-					? new Date(res.reloadsAt)
-					: undefined
+			setSessionState({
+				id: res.id,
+				pixels: res.pixels,
+				pixelsReloadAt: res.reloadsAt ? new Date(res.reloadsAt) : undefined
 			})
 		)
 	}
@@ -100,6 +106,8 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 			y
 		}
 
+		setMousePos({ x, y })
+
 		if (dragRef.current.dragging) {
 			setOffset({
 				x: e.clientX - dragRef.current.start.x,
@@ -135,7 +143,7 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 			canvas.height = info.height
 
 			const image = document.createElement('img')
-			image.src = `${getRestUrl()}${info.path}`
+			image.src = `${getRestUrl()}${info.path}?t=${Date.now()}`
 			image.className = 'image'
 
 			image.onload = () => {
@@ -179,6 +187,14 @@ export const PaintCanvas = ({ info, zoom, color }: Props) => {
 				onMouseMove={handleMouseMove}
 				onContextMenu={blockContext}
 			/>
+			<ClickPreview
+				style={{
+					left: `${(offset.x + mousePos.x) * zoom}px`,
+					top: `${(offset.y + mousePos.y) * zoom}px`,
+					width: `${actualZoom}px`,
+					height: `${actualZoom}px`
+				}}
+			/>
 		</CanvasContainer>
 	)
 }
@@ -189,6 +205,7 @@ const CanvasContainer = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	position: relative;
 `
 
 const StyledCanvas = styled.canvas`
@@ -201,4 +218,9 @@ const StyledCanvas = styled.canvas`
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
 	cursor: crosshair;
+`
+
+const ClickPreview = styled.div`
+	position: absolute;
+	background: rgba(0, 0, 0, 0.5);
 `

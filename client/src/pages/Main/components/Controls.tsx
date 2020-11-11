@@ -1,23 +1,23 @@
-import { SessionModal } from '@/pages/Main/components/SessionModal'
-import { setApiState } from '@/store/modules/api'
+import { setCanvasState } from '@/store/modules/canvas'
+import { setSessionState } from '@/store/modules/session'
 import { useAppDispatch, useAppStore, useInterval } from '@/utils/hooks'
 import React, { useEffect, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 import styled from 'styled-components'
 
 type Props = {
-	color: string
-	setColor: (color: string) => void
+	onSessionRequested: () => void
 }
 
-export const Controls = ({ color, setColor }: Props) => {
+export const Controls = ({ onSessionRequested }: Props) => {
 	const dispatch = useAppDispatch()
-	const session = useAppStore(state => state.api.session)
-	const pixels = useAppStore(state => state.api.sessionPixels)
-	const reloadsAt = useAppStore(state => state.api.sessionPixelsReloadAt)
+	const session = useAppStore(state => state.session.id)
+	const pixels = useAppStore(state => state.session.pixels)
+	const reloadsAt = useAppStore(state => state.session.pixelsReloadAt)
+	const color = useAppStore(state => state.canvas.color)
+	const tool = useAppStore(state => state.canvas.tool)
 
 	const [reloadsIn, setReloadsIn] = useState(0)
-	const [sessionModal, setSessionModal] = useState(false)
 
 	const updateReload = () => {
 		const reloadsIn = reloadsAt
@@ -26,12 +26,8 @@ export const Controls = ({ color, setColor }: Props) => {
 
 		setReloadsIn(reloadsIn)
 
-		if (reloadsIn === 0) {
-			dispatch(
-				setApiState({
-					sessionPixels: 10
-				})
-			)
+		if (reloadsIn === 0 && pixels !== 10) {
+			dispatch(setSessionState({ pixels: 10 }))
 		}
 	}
 
@@ -47,14 +43,18 @@ export const Controls = ({ color, setColor }: Props) => {
 
 	const togglePicker = () => setPicker(picker => !picker)
 
+	const handleColor = (color: string) => {
+		setCanvasState({ color })
+	}
+
 	return (
 		<C>
 			{session ? (
 				<>
 					{picker && (
 						<Picker>
-							<HexColorPicker onChange={setColor} color={color} />
-							<HexColorInput onChange={setColor} color={color} />
+							<HexColorPicker onChange={handleColor} color={color} />
+							<HexColorInput onChange={handleColor} color={color} />
 						</Picker>
 					)}
 					<ButtonsRow>
@@ -69,12 +69,9 @@ export const Controls = ({ color, setColor }: Props) => {
 				</>
 			) : (
 				<>
-					<SessionButton onClick={() => setSessionModal(true)}>
+					<SessionButton onClick={() => onSessionRequested()}>
 						Click here to start painting
 					</SessionButton>
-					{sessionModal && (
-						<SessionModal onClose={() => setSessionModal(false)} />
-					)}
 				</>
 			)}
 		</C>

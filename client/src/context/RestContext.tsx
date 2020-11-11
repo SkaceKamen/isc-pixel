@@ -10,7 +10,7 @@ export const RestContextProvider = ({
 }: {
 	children: React.ReactNode
 }) => {
-	const session = useAppStore(state => state.api.session)
+	const session = useAppStore(state => state.session.id)
 	const client = useMemo(() => new RestClient(getRestUrl(), session), [session])
 
 	return <RestContext.Provider value={client}>{children}</RestContext.Provider>

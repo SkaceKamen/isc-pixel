@@ -9,9 +9,6 @@ export enum ApiState {
 const initialState = {
 	error: null as string | null,
 	state: ApiState.Connecting,
-	session: undefined as string | undefined,
-	sessionPixels: 0 as number,
-	sessionPixelsReloadAt: undefined as Date | undefined,
 	reconnecting: false,
 	failed: false
 }

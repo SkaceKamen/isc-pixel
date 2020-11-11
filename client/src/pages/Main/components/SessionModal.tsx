@@ -3,7 +3,7 @@ import { Loader } from '@/components'
 import { Kaptcha } from '@/components/Kaptcha/Kaptcha'
 import { Modal } from '@/components/Modal/Modal'
 import { useRest } from '@/context/RestContext'
-import { setApiState } from '@/store/modules/api'
+import { setSessionState } from '@/store/modules/session'
 import { useAppDispatch } from '@/utils/hooks'
 import React, { useEffect, useState } from 'react'
 
@@ -38,7 +38,7 @@ export const SessionModal = ({ onClose }: Props) => {
 		})
 
 		if (res.session && res.pixels !== undefined) {
-			dispatch(setApiState({ session: res.session, sessionPixels: res.pixels }))
+			dispatch(setSessionState({ id: res.session, pixels: res.pixels }))
 		} else {
 			await loadSession()
 		}

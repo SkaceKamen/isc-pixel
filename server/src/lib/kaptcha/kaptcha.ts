@@ -108,7 +108,7 @@ export class Kaptcha {
 
 		const font1 = await Jimp.loadFont(this.font2)
 		const letter = this.targetLetter(record, step)
-		const letterImage = await this.createRandomLetterImage(font1, letter, 2)
+		const letterImage = await this.createRandomLetterImage(font1, letter)
 
 		const width = letterImage.getWidth()
 		const height = letterImage.getHeight()
@@ -124,7 +124,7 @@ export class Kaptcha {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	protected async createRandomLetterImage(font: any, letter: string, blur = 1) {
+	protected async createRandomLetterImage(font: any, letter: string) {
 		const border = 5
 		const width = Jimp.measureText(font, letter)
 		const height = Jimp.measureTextHeight(font, letter, Infinity)
@@ -141,11 +141,9 @@ export class Kaptcha {
 		letterImage.color(
 			(['red', 'green', 'blue'] as const).map((color) => ({
 				apply: color,
-				params: [Math.round(this.random.get(`letter-color-${color}`) * 80)],
+				params: [Math.round(this.random.get(`letter-color-${color}`) * 90)],
 			}))
 		)
-
-		letterImage.blur(blur)
 
 		return letterImage
 	}
@@ -212,7 +210,7 @@ export class Kaptcha {
 			const font = this.random.get('letter-font') > 0.5 ? font2 : font1
 			const letterImage = await this.createRandomLetterImage(font, letter)
 
-			letterImage.fade(this.random.get('letter-fade') * 0.6)
+			letterImage.fade(0.5 + this.random.get('letter-fade') * 0.3)
 
 			const pos = randomLetterPosition()
 
@@ -225,6 +223,8 @@ export class Kaptcha {
 
 		const font = this.random.get('main-letter-font') > 0.5 ? font2 : font1
 		const main = await this.createRandomLetterImage(font, targetLetter)
+
+		main.fade(0.3 + this.random.get('letter-fade') * 0.1)
 
 		image.blit(
 			main,
