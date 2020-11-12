@@ -6,5 +6,5 @@ export const getWebsocketUrl = () => {
 }
 
 export const getRestUrl = () => {
-	return `//${process.env.APP_API_URL}` || ''
+	return `//${process.env.APP_API_URL || window.location.host}` || ''
 }

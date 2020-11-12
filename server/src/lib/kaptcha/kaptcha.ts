@@ -123,8 +123,12 @@ export class Kaptcha {
 		return await image.getBufferAsync(Jimp.MIME_JPEG)
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	protected async createRandomLetterImage(font: any, letter: string) {
+	protected async createRandomLetterImage(
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		font: any,
+		letter: string,
+		main = false
+	) {
 		const border = 5
 		const width = Jimp.measureText(font, letter)
 		const height = Jimp.measureTextHeight(font, letter, Infinity)
@@ -141,7 +145,12 @@ export class Kaptcha {
 		letterImage.color(
 			(['red', 'green', 'blue'] as const).map((color) => ({
 				apply: color,
-				params: [Math.round(this.random.get(`letter-color-${color}`) * 90)],
+				params: [
+					(main ? 30 : 30) +
+						Math.round(
+							this.random.get(`letter-color-${color}`) * (main ? 20 : 35)
+						),
+				],
 			}))
 		)
 
@@ -202,6 +211,8 @@ export class Kaptcha {
 				this.random.get('letter-pos-y') * (height - this.border * 2),
 		})
 
+		const filled = {} as Record<string, number>
+
 		for (let i = 0; i < width / 2; i++) {
 			const letter = letters.charAt(
 				Math.round((letters.length - 1) * this.random.get('letter'))
@@ -212,17 +223,28 @@ export class Kaptcha {
 
 			letterImage.fade(0.5 + this.random.get('letter-fade') * 0.3)
 
-			const pos = randomLetterPosition()
+			let tries = 0
 
-			image.blit(
-				letterImage,
-				pos.x - letterImage.getWidth() / 2,
-				pos.y - letterImage.getHeight() / 2
-			)
+			while (tries++ < 10) {
+				const pos = randomLetterPosition()
+				const posKey = `${Math.floor(pos.x / 32)}-${Math.floor(pos.y / 32)}`
+
+				if ((filled[posKey] ?? 0) < 2) {
+					image.blit(
+						letterImage,
+						pos.x - letterImage.getWidth() / 2,
+						pos.y - letterImage.getHeight() / 2
+					)
+
+					filled[posKey] = filled[posKey] ?? 0 + 1
+
+					break
+				}
+			}
 		}
 
 		const font = this.random.get('main-letter-font') > 0.5 ? font2 : font1
-		const main = await this.createRandomLetterImage(font, targetLetter)
+		const main = await this.createRandomLetterImage(font, targetLetter, true)
 
 		main.fade(0.3 + this.random.get('letter-fade') * 0.1)
 

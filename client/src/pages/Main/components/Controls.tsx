@@ -62,7 +62,7 @@ export const Controls = ({ onSessionRequested }: Props) => {
 	const togglePicker = () => setPicker(picker => !picker)
 
 	const handleColor = (color: string) => {
-		setCanvasState({ color })
+		dispatch(setCanvasState({ color }))
 	}
 
 	const handleTool = (tool: CanvasTool) => () =>

@@ -64,7 +64,7 @@ export class OAuthModel implements PasswordModel, RefreshTokenModel {
 	}
 
 	async getUser(username: string, password: string) {
-		const user: User = await User.findOne({ where: { username } })
+		const user = await User.findOne({ where: { username } })
 
 		if (!user || !user.passwordMatch(password)) {
 			return false
