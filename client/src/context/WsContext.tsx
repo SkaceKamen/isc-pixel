@@ -14,20 +14,21 @@ export const WsContextProvider = ({
 }) => {
 	const dispatch = useDispatch()
 	const state = useAppStore(state => state.api.state)
+	const session = useAppStore(state => state.session.id)
 	const [reconnectCount, setReconnectCount] = useState(0)
 	const [client, setClient] = useState(null as WsClient | null)
 
 	useEffect(() => {
-		if (state === ApiState.Connecting) {
+		if (state === ApiState.Connecting || session !== client?.session) {
 			if (client) {
 				client.onClose = undefined
 				client.onOpen = undefined
 				client.disconnect()
 			}
 
-			setClient(new WsClient(getWebsocketUrl()))
+			setClient(new WsClient(getWebsocketUrl(), session))
 		}
-	}, [state])
+	}, [state, session])
 
 	useEffect(() => {
 		if (client) {
@@ -35,6 +36,10 @@ export const WsContextProvider = ({
 
 			client.onOpen = () => {
 				setReconnectCount(0)
+
+				if (session) {
+					client.send
+				}
 
 				dispatch(
 					setApiState({

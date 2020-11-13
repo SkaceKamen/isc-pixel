@@ -1,5 +1,5 @@
 import { Token } from 'oauth2-server'
-import { Session } from '../sessions'
+import { UserSession } from '@shared/models'
 import { User } from '../models/db/user'
 
 interface Locals {
@@ -7,7 +7,7 @@ interface Locals {
 		token: Token
 	}
 	user?: User
-	session?: Session
+	session?: UserSession
 }
 
 declare module 'express' {

@@ -7,7 +7,7 @@ import { intToRGBA, rgbToHex } from '@/utils/color'
 import { relativeMousePosition } from '@/utils/dom'
 import { useAppDispatch, useAppStore } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
-import { Pixel } from '@shared/ws'
+import { Pixel } from '@shared/models'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import pickerIcon from '@/assets/picker-icon.png'
@@ -188,7 +188,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		return () => {
 			ws.onPixel.off(handlePixel)
 		}
-	}, [handlePixel])
+	}, [handlePixel, ws])
 
 	useEffect(() => {
 		const mouse = mouseRef.current

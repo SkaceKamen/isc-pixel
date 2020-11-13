@@ -9,7 +9,7 @@ import { AuthToken } from './models/db/auth-token'
 import { User } from './models/db/user'
 import { MemoryKaptchaModel } from './models/kaptcha-model'
 import { OAuthModel } from './models/oauth-model'
-import { Pixel } from './models/pixel'
+import { Pixel, UserSession } from '@shared/models'
 import { Sessions } from './sessions'
 import { AppStorage } from './storage'
 
@@ -19,6 +19,7 @@ export const appContext = (config: AppConfig) => ({
 	config,
 	bus: {
 		newPixel: new BusDispatcher<Pixel>(),
+		sessionChanged: new BusDispatcher<UserSession>(),
 	},
 	sequelize: new Sequelize({
 		...config.sequelize,

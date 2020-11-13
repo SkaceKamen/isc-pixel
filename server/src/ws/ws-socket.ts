@@ -1,9 +1,11 @@
 import { IncomingMessage } from 'http'
 import { Socket } from 'net'
+import { UserSession } from '@shared/models'
 import WebSocket from 'ws'
 import { AppContext } from '../context'
-import { Pixel } from '../models/pixel'
+import { Pixel } from '@shared/models'
 import { WsClient } from './ws-client'
+import { newPixel, sessionChange } from '@shared/ws'
 
 export class WsSocket {
 	socket: WebSocket.Server
@@ -17,15 +19,20 @@ export class WsSocket {
 		this.socket.on('connection', this.handleConnection)
 
 		this.context.bus.newPixel.listen(this.handleNewPixel)
+		this.context.bus.sessionChanged.listen(this.handleSessionChange)
 	}
 
 	handleNewPixel = (pixel: Pixel) => {
 		this.clients.forEach((client) => {
-			client.socket.send(
-				JSON.stringify({
-					pixel,
-				})
-			)
+			client.send(newPixel(pixel))
+		})
+	}
+
+	handleSessionChange = (session: UserSession) => {
+		this.clients.forEach((client) => {
+			if (client.session === session.id) {
+				client.send(sessionChange(session))
+			}
 		})
 	}
 

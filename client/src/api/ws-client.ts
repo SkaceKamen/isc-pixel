@@ -1,8 +1,10 @@
 import { MyEvent } from '@/utils/events'
-import { Pixel, WsMessage } from '@shared/ws'
+import { Pixel, UserSession } from '@shared/models'
+import { setSession, WsMessage, WsMessageType } from '@shared/ws'
 
 export class WsClient {
 	url: string
+	session?: string
 
 	socket?: WebSocket
 
@@ -11,9 +13,11 @@ export class WsClient {
 	onMessage?: (msg: WsMessage) => void
 
 	onPixel = new MyEvent<Pixel>()
+	onSession = new MyEvent<UserSession>()
 
-	constructor(url: string) {
+	constructor(url: string, session?: string) {
 		this.url = url
+		this.session = session
 	}
 
 	connect() {
@@ -25,6 +29,10 @@ export class WsClient {
 		this.socket = new WebSocket(this.url)
 
 		this.socket.onopen = () => {
+			if (this.session) {
+				this.send(setSession(this.session))
+			}
+
 			this.onOpen?.()
 		}
 
@@ -37,10 +45,34 @@ export class WsClient {
 
 			this.onMessage?.(msg)
 
-			if (msg.pixel) {
-				this.onPixel.emit(msg.pixel)
+			switch (msg.type) {
+				case WsMessageType.NewPixel: {
+					this.onPixel.emit(msg.pixel)
+					break
+				}
+
+				case WsMessageType.SessionChange: {
+					this.onSession.emit(msg.session)
+					break
+				}
+
+				/*
+				default: {
+					throw new Error(
+						`Unknown message type: ${msg.type} (${WsMessageType[msg.type]})`
+					)
+				}
+				*/
 			}
 		}
+	}
+
+	send(msg: WsMessage) {
+		if (!this.socket) {
+			throw new Error("Can't send message: Socket not connected")
+		}
+
+		this.socket.send(JSON.stringify(msg))
 	}
 
 	disconnect() {

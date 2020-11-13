@@ -1,17 +1,28 @@
 import { v4 as uuidv4 } from 'uuid'
 import { hours, minutes } from './lib/time'
-
-export type Session = {
-	id: string
-	pixels: number
-	reloadsAt?: number
-	expiresAt: number
-}
+import { UserSession } from '@shared/models'
+import { AppContext } from './context'
 
 export class Sessions {
-	items = {} as Record<string, Session>
+	items = {} as Record<string, UserSession>
 
 	interval?: ReturnType<typeof setInterval>
+
+	private _context?: AppContext
+
+	get context() {
+		if (!this._context) {
+			throw new Error('Trying to access context before initialization')
+		}
+
+		return this._context
+	}
+
+	initialize(context: AppContext) {
+		this._context = context
+
+		return this
+	}
 
 	async create() {
 		const session = {
@@ -25,7 +36,7 @@ export class Sessions {
 		return session
 	}
 
-	async get(id: string): Promise<Session | undefined> {
+	async get(id: string): Promise<UserSession | undefined> {
 		return this.items[id]
 	}
 
@@ -42,6 +53,8 @@ export class Sessions {
 		if (session.reloadsAt === undefined) {
 			session.reloadsAt = Date.now() + minutes(1)
 		}
+
+		this.context.bus.sessionChanged.dispatch(session)
 	}
 
 	start() {
@@ -68,6 +81,7 @@ export class Sessions {
 				if (item.reloadsAt !== undefined && Date.now() >= item.reloadsAt) {
 					item.pixels = 10
 					item.reloadsAt = undefined
+					this.context.bus.sessionChanged.dispatch(item)
 				}
 			}
 		})
