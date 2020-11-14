@@ -4,6 +4,25 @@ import { CaptchaFinishResponse } from '@shared/rest'
 import { asyncRoute } from '../async-route'
 
 export const sessionApi = appController((router, { sessions, kaptcha }) => {
+	router.get(
+		'/:id',
+		asyncRoute(async (req, res) => {
+			const id = req.params['id']
+
+			if (!id) {
+				throw new Error('Id is required')
+			}
+
+			const session = await sessions.get(id)
+
+			if (!session) {
+				res.status(404).send()
+			}
+
+			res.json(session)
+		})
+	)
+
 	router.post(
 		'/',
 		asyncRoute(async (_req, res) => {

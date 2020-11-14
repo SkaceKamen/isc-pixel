@@ -8,6 +8,10 @@ module.exports = {
 		width: 512,
 		height: 512,
 	},
+	drawing: {
+		pixels: 30,
+		timeout: 30,
+	},
 	sequelize: {
 		database: 'database',
 		dialect: 'sqlite',

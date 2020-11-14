@@ -1,5 +1,4 @@
 import { CanvasTool, setCanvasState } from '@/store/modules/canvas'
-import { setSessionState } from '@/store/modules/session'
 import {
 	useAppDispatch,
 	useAppStore,
@@ -9,8 +8,6 @@ import {
 import React, { useEffect, useState } from 'react'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 import styled from 'styled-components'
-import pickerIcon from '@/assets/picker-icon.png'
-import paintIcon from '@/assets/paint-icon.png'
 
 type Props = {
 	onSessionRequested: () => void
@@ -43,10 +40,6 @@ export const Controls = ({ onSessionRequested }: Props) => {
 			: 0
 
 		setReloadsIn(reloadsIn)
-
-		if (reloadsIn === 0 && pixels !== 10) {
-			dispatch(setSessionState({ pixels: 10 }))
-		}
 	}
 
 	useEffect(() => {
@@ -65,9 +58,6 @@ export const Controls = ({ onSessionRequested }: Props) => {
 		dispatch(setCanvasState({ color }))
 	}
 
-	const handleTool = (tool: CanvasTool) => () =>
-		dispatch(setCanvasState({ tool }))
-
 	return (
 		<C>
 			{session ? (
@@ -78,30 +68,12 @@ export const Controls = ({ onSessionRequested }: Props) => {
 							<HexColorInput onChange={handleColor} color={color} />
 						</Picker>
 					)}
-					{/*
-					<Tools>
-						<Tool onClick={handleTool(CanvasTool.Paint)}>
-							<img
-								src={paintIcon}
-								className="x2-icon pixel-perfect"
-								alt="Paint tool"
-							/>
-						</Tool>
-						<Tool onClick={handleTool(CanvasTool.Pick)}>
-							<img
-								src={pickerIcon}
-								className="x2-icon pixel-perfect"
-								alt="Pick color (CTRL)"
-							/>
-						</Tool>
-					</Tools>
-					*/}
 					<ButtonsRow>
 						<CurrentColor
 							onClick={togglePicker}
 							style={{ backgroundColor: color }}
 						>
-							<span>{reloadsIn === 0 ? 10 : pixels}</span>
+							<span>{pixels}</span>
 						</CurrentColor>
 						{reloadsIn > 0 && <ReloadsIn>Reloads in {reloadsIn} s</ReloadsIn>}
 					</ButtonsRow>
@@ -109,7 +81,7 @@ export const Controls = ({ onSessionRequested }: Props) => {
 			) : (
 				<>
 					<SessionButton onClick={() => onSessionRequested()}>
-						Click here to start painting
+						Click to start painting
 					</SessionButton>
 				</>
 			)}
@@ -125,12 +97,6 @@ const C = styled.div`
 	z-index: 1;
 	background: rgb(0, 0, 0, 0.9);
 `
-
-const Tools = styled.div`
-	display: flex;
-`
-
-const Tool = styled.div``
 
 const ButtonsRow = styled.div`
 	display: flex;

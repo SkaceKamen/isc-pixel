@@ -1,4 +1,4 @@
-import { UserSession } from '@shared/models'
+import { UserSessionInfo } from '@shared/models'
 import { appController } from '../app-controller'
 import { pixelValidator } from '../validator/pixel'
 import { asyncRoute } from '../async-route'
@@ -21,7 +21,7 @@ export const pixelApi = appController(
 		router.put(
 			'/',
 			asyncRoute(async (req, res) => {
-				const session = res.locals.session as UserSession
+				const session = res.locals.session as UserSessionInfo
 
 				if (!session) {
 					throw new Error(`Session is required`)

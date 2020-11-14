@@ -1,3 +1,4 @@
+import { UserSessionInfo } from '@shared/models'
 import {
 	CanvasInfo,
 	CaptchaFinishRequest,
@@ -53,5 +54,15 @@ export class RestClient {
 		})
 
 		return (await res.json()) as CaptchaFinishResponse
+	}
+
+	async getSession(id: string) {
+		const res = await fetch(`${this.url}/session/${id}`)
+
+		if (!res.ok) {
+			return undefined
+		}
+
+		return (await res.json()) as UserSessionInfo
 	}
 }

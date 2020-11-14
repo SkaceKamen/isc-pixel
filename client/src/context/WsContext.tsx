@@ -1,6 +1,7 @@
 import { getWebsocketUrl } from '@/api/utils'
 import { WsClient } from '@/api/ws-client'
 import { ApiState, setApiState } from '@/store/modules/api'
+import { setSessionState } from '@/store/modules/session'
 import { useAppStore } from '@/utils/hooks'
 import React, { useContext, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -69,6 +70,18 @@ export const WsContextProvider = ({
 					)
 				}
 			}
+
+			client.onSession.on(session => {
+				dispatch(
+					setSessionState({
+						id: session.id,
+						pixels: session.pixels,
+						pixelsReloadAt: session.reloadsAt
+							? new Date(session.reloadsAt)
+							: undefined
+					})
+				)
+			})
 		}
 	}, [client])
 

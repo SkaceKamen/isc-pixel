@@ -1,4 +1,4 @@
-import { Pixel, UserSession } from './models'
+import { Pixel, UserSessionInfo } from './models'
 
 export enum WsMessageType {
 	NewPixel,
@@ -13,7 +13,7 @@ export const newPixel = (pixel: Pixel) =>
 		pixel,
 	} as const)
 
-export const sessionChange = (session: UserSession) =>
+export const sessionChange = (session: UserSessionInfo) =>
 	({
 		type: WsMessageType.SessionChange,
 		session,

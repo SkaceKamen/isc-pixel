@@ -1,15 +1,13 @@
+import { Pixel, UserSessionInfo } from '@shared/models'
 import OAuth2Server from 'oauth2-server'
 import { Sequelize, SequelizeOptions } from 'sequelize-typescript'
 import { AppConfig } from './lib/config'
 import { BusDispatcher } from './lib/dispatcher'
 import { Kaptcha } from './lib/kaptcha/kaptcha'
 import { Canvas } from './models/canvas'
-import { AuthClient } from './models/db/auth-client'
-import { AuthToken } from './models/db/auth-token'
-import { User } from './models/db/user'
+import { UserSession } from './models/db/user-session'
 import { MemoryKaptchaModel } from './models/kaptcha-model'
 import { OAuthModel } from './models/oauth-model'
-import { Pixel, UserSession } from '@shared/models'
 import { Sessions } from './sessions'
 import { AppStorage } from './storage'
 
@@ -19,11 +17,11 @@ export const appContext = (config: AppConfig) => ({
 	config,
 	bus: {
 		newPixel: new BusDispatcher<Pixel>(),
-		sessionChanged: new BusDispatcher<UserSession>(),
+		sessionChanged: new BusDispatcher<UserSessionInfo>(),
 	},
 	sequelize: new Sequelize({
 		...config.sequelize,
-		models: [AuthClient, AuthToken, User],
+		models: [UserSession],
 	} as SequelizeOptions),
 	oauth: new OAuth2Server({
 		model: new OAuthModel(),

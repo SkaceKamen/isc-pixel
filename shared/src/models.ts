@@ -4,7 +4,7 @@ export type Pixel = {
 	color: number
 }
 
-export type UserSession = {
+export type UserSessionInfo = {
 	id: string
 	pixels: number
 	reloadsAt?: number

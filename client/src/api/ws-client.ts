@@ -1,5 +1,5 @@
 import { MyEvent } from '@/utils/events'
-import { Pixel, UserSession } from '@shared/models'
+import { Pixel, UserSessionInfo } from '@shared/models'
 import { setSession, WsMessage, WsMessageType } from '@shared/ws'
 
 export class WsClient {
@@ -13,7 +13,7 @@ export class WsClient {
 	onMessage?: (msg: WsMessage) => void
 
 	onPixel = new MyEvent<Pixel>()
-	onSession = new MyEvent<UserSession>()
+	onSession = new MyEvent<UserSessionInfo>()
 
 	constructor(url: string, session?: string) {
 		this.url = url

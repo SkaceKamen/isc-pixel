@@ -1,3 +1,4 @@
+import { Loader } from '@/components'
 import { ApiState } from '@/store/modules/api'
 import { colors } from '@/styles'
 import { GlobalStyle } from '@/styles/global'
@@ -6,6 +7,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { Main } from '../Main/Main'
 import { ApiErrorMessage } from './components/ApiErrorMessage'
+import { LocalStorage } from './components/LocalStorage'
 
 export const App = () => {
 	const apiState = useAppStore(state => state.api.state)
@@ -14,7 +16,9 @@ export const App = () => {
 		<AppContainer id="stars">
 			<GlobalStyle />
 
-			{apiState === ApiState.Connected && <Main />}
+			<LocalStorage />
+
+			{apiState === ApiState.Connected ? <Main /> : <Loader loaded={false} />}
 
 			<ApiErrorMessage />
 		</AppContainer>

@@ -1,6 +1,6 @@
 import { IncomingMessage } from 'http'
 import { Socket } from 'net'
-import { UserSession } from '@shared/models'
+import { UserSessionInfo } from '@shared/models'
 import WebSocket from 'ws'
 import { AppContext } from '../context'
 import { Pixel } from '@shared/models'
@@ -28,7 +28,7 @@ export class WsSocket {
 		})
 	}
 
-	handleSessionChange = (session: UserSession) => {
+	handleSessionChange = (session: UserSessionInfo) => {
 		this.clients.forEach((client) => {
 			if (client.session === session.id) {
 				client.send(sessionChange(session))

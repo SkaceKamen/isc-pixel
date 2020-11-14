@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
-import { hours, minutes } from './lib/time'
-import { UserSession } from '@shared/models'
+import { hours, minutes, seconds } from './lib/time'
+import { UserSessionInfo } from '@shared/models'
 import { AppContext } from './context'
+import { UserSession } from './models/db/user-session'
+import { userSessionToInfo } from './serializers/user-session'
 
 export class Sessions {
-	items = {} as Record<string, UserSession>
-
 	interval?: ReturnType<typeof setInterval>
 
 	private _context?: AppContext
@@ -27,34 +27,48 @@ export class Sessions {
 	async create() {
 		const session = {
 			id: uuidv4(),
-			pixels: 10,
+			pixels: this.context.config.drawing.pixels,
 			expiresAt: Date.now() + hours(1),
 		}
 
-		this.items[session.id] = session
+		await UserSession.create(session)
 
 		return session
 	}
 
-	async get(id: string): Promise<UserSession | undefined> {
-		return this.items[id]
+	async get(id: string): Promise<UserSessionInfo | undefined> {
+		const record = await this.getRecord(id)
+
+		if (record) {
+			return userSessionToInfo(record)
+		}
+
+		return undefined
+	}
+
+	async getRecord(id: string): Promise<UserSession | null> {
+		return await UserSession.findByPk(id)
 	}
 
 	async pixelUsed(id: string) {
-		const session = await this.get(id)
+		const session = await this.getRecord(id)
 
 		if (!session) {
 			throw new Error(`Invalid session ${id}`)
 		}
 
 		session.pixels -= 1
-		session.expiresAt = Date.now() + hours(1)
+		session.expiresAt = new Date(Date.now() + hours(1))
 
-		if (session.reloadsAt === undefined) {
-			session.reloadsAt = Date.now() + minutes(1)
+		if (!session.reloadsAt) {
+			session.reloadsAt = new Date(
+				Date.now() + seconds(this.context.config.drawing.timeout)
+			)
 		}
 
-		this.context.bus.sessionChanged.dispatch(session)
+		await session.save()
+
+		this.context.bus.sessionChanged.dispatch(userSessionToInfo(session))
 	}
 
 	start() {
@@ -73,15 +87,22 @@ export class Sessions {
 		}
 	}
 
-	tick() {
-		Object.values(this.items).forEach((item) => {
-			if (Date.now() >= item.expiresAt) {
-				delete this.items[item.id]
+	async tick() {
+		const items = await UserSession.findAll()
+
+		items.forEach(async (item) => {
+			if (Date.now() >= item.expiresAt.getTime()) {
+				item.destroy()
 			} else {
-				if (item.reloadsAt !== undefined && Date.now() >= item.reloadsAt) {
-					item.pixels = 10
-					item.reloadsAt = undefined
-					this.context.bus.sessionChanged.dispatch(item)
+				if (item.reloadsAt && Date.now() >= item.reloadsAt?.getTime()) {
+					item.pixels = this.context.config.drawing.pixels
+					item.reloadsAt = (null as unknown) as undefined
+
+					await item.save()
+
+					console.log('Updated, pixels are at', item.pixels)
+
+					this.context.bus.sessionChanged.dispatch(userSessionToInfo(item))
 				}
 			}
 		})

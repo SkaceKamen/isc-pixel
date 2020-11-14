@@ -17,6 +17,10 @@ export const config = {
 		width: userConfig.canvas.width as number,
 		height: userConfig.canvas.height as number,
 	},
+	drawing: {
+		pixels: (userConfig.drawing.pixels ?? 10) as number,
+		timeout: (userConfig.drawing.timeout ?? 30) as number,
+	},
 	sequelize: userConfig.sequelize as SequelizeOptions,
 	kaptcha: userConfig.kaptcha as {
 		font1path: string

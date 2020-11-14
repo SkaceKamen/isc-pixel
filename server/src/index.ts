@@ -6,8 +6,8 @@ import { attachWsServer } from './server'
 
 async function main() {
 	const context = appContext(config)
+	await context.sequelize.sync()
 	context.sessions.initialize(context)
-	// await context.sequelize.sync()
 
 	await context.storage.initialize()
 
