@@ -6,9 +6,11 @@ export enum CanvasTool {
 }
 
 const initialState = {
-	color: '#000000',
 	tool: CanvasTool.Paint,
-	favourites: [] as string[]
+	selectedColor: 0,
+	palette: [] as string[],
+	width: 0,
+	height: 0
 }
 
 export default (state = initialState, action: Actions): State => {

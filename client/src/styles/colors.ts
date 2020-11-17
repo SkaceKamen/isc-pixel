@@ -1,7 +1,7 @@
 import { lighten, darken, rgba } from 'polished'
 
-const application = '#182541'
-const text = '#BDCBEE'
+const application = '#202020'
+const text = '#fefefe'
 const primary = lighten(0.1, application)
 const secondary = '#265560'
 const info = '#265560'

@@ -37,3 +37,9 @@ export const rgbToHex = (r: number, g: number, b: number) =>
 	r.toString(16).padStart(2, '0') +
 	g.toString(16).padStart(2, '0') +
 	b.toString(16).padStart(2, '0')
+
+export const hexToRgb = (hex: string) => ({
+	r: parseInt(hex.substr(0, 2), 16),
+	g: parseInt(hex.substr(2, 2), 16),
+	b: parseInt(hex.substr(4, 2), 16)
+})

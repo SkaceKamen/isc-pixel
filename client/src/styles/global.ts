@@ -2,7 +2,6 @@ import { createGlobalStyle } from 'styled-components'
 import colors from './colors'
 import input from './components/input'
 import reset from './components/reset'
-import scrollbar from './components/scrollbar'
 import { media } from './media'
 import transitions from './components/transitions'
 
@@ -48,7 +47,6 @@ ${media.medium} {
   }
 }
 
-${scrollbar}
 ${input}
 ${transitions}
 

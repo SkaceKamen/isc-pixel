@@ -21,14 +21,14 @@ export class RestClient {
 		return (await res.json()) as CanvasInfo
 	}
 
-	async putPixel(x: number, y: number, color: number) {
+	async putPixel(x: number, y: number, colorIndex: number) {
 		const res = await fetch(`${this.url}/pixel`, {
 			method: 'PUT',
 			headers: {
 				'Content-type': 'application/json',
 				...(this.session ? { 'x-session': this.session } : {})
 			},
-			body: JSON.stringify({ x, y, color })
+			body: JSON.stringify({ x, y, color: colorIndex })
 		})
 
 		return (await res.json()) as PixelResponse

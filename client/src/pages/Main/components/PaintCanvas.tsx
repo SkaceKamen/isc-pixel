@@ -3,7 +3,7 @@ import { useRest } from '@/context/RestContext'
 import { useWs } from '@/context/WsContext'
 import { CanvasTool, setCanvasState } from '@/store/modules/canvas'
 import { setSessionState } from '@/store/modules/session'
-import { intToRGBA, rgbToHex } from '@/utils/color'
+import { hexToRgb, intToRGBA, rgbToHex } from '@/utils/color'
 import { relativeMousePosition } from '@/utils/dom'
 import { useAppDispatch, useAppStore } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
@@ -25,8 +25,9 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 
 	const session = useAppStore(state => state.session.id)
 	const pixels = useAppStore(state => state.session.pixels)
-	const color = useAppStore(state => state.canvas.color)
+	const selectedColor = useAppStore(state => state.canvas.selectedColor)
 	const tool = useAppStore(state => state.canvas.tool)
+	const palette = useAppStore(state => state.canvas.palette)
 
 	const dragRef = useRef({
 		dragging: false,
@@ -50,6 +51,30 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 
+	const paletteIndexAt = (x: number, y: number) => {
+		if (!canvasRef.current) {
+			console.warn('Palette index requested before canvas is initialized')
+
+			return -1
+		}
+
+		const ctx = canvasRef.current.getContext('2d')
+
+		if (!ctx) {
+			throw new Error('Failed to get 2D context')
+		}
+
+		const data = ctx.getImageData(x, y, 1, 1).data
+		const color = '#' + rgbToHex(data[0], data[1], data[2])
+		const index = palette.indexOf(color)
+
+		if (index < 0) {
+			console.warn('Color', color, 'has no index in palette', palette)
+		}
+
+		return index
+	}
+
 	const handleClick = async (e: React.MouseEvent) => {
 		if (!session) {
 			onSessionRequested()
@@ -61,31 +86,21 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 
 		switch (tool) {
 			case CanvasTool.Pick: {
-				if (!canvasRef.current) {
-					return
+				const index = paletteIndexAt(x, y)
+
+				if (index >= 0) {
+					dispatch(setCanvasState({ selectedColor: index }))
 				}
-
-				const ctx = canvasRef.current.getContext('2d')
-
-				if (!ctx) {
-					throw new Error('Failed to get 2D context')
-				}
-
-				const data = ctx.getImageData(x, y, 1, 1).data
-
-				dispatch(
-					setCanvasState({ color: '#' + rgbToHex(data[0], data[1], data[2]) })
-				)
 
 				break
 			}
 
 			case CanvasTool.Paint: {
-				if (pixels <= 0) {
+				if (pixels <= 0 || paletteIndexAt(x, y) === selectedColor) {
 					return
 				}
 
-				const res = await rest.putPixel(x, y, parseInt(color.slice(1), 16))
+				const res = await rest.putPixel(x, y, selectedColor)
 
 				dispatch(
 					setSessionState({
@@ -153,7 +168,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		const ctx = canvasRef.current?.getContext('2d')
 
 		if (ctx) {
-			const color = intToRGBA(pixel.color * 0x100 + 0xff)
+			const color = hexToRgb(palette[pixel.color].substr(1))
 			const id = ctx.createImageData(1, 1)
 			const d = id.data
 			d[0] = color.r

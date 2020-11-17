@@ -76,7 +76,7 @@ export class Sessions {
 			this.stop()
 		}
 
-		this.interval = setInterval(() => this.tick(), 1000)
+		this.interval = setInterval(() => this.tick(), 500)
 	}
 
 	stop() {
@@ -99,8 +99,6 @@ export class Sessions {
 					item.reloadsAt = (null as unknown) as undefined
 
 					await item.save()
-
-					console.log('Updated, pixels are at', item.pixels)
 
 					this.context.bus.sessionChanged.dispatch(userSessionToInfo(item))
 				}

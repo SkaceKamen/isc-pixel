@@ -198,17 +198,6 @@ const Popup = styled.div<{ closing?: boolean; closeAnimation?: Keyframes }>`
 	border-radius: 0px;
 
 	background-color: ${background};
-	background: linear-gradient(
-		45deg,
-		${darken(0.01, background)} 25%,
-		${background} 25%,
-		${background} 50%,
-		${darken(0.01, background)} 50%,
-		${darken(0.01, background)} 75%,
-		${background} 75%,
-		${background}
-	);
-	background-size: 40px 40px;
 
 	min-width: 200px;
 	max-width: 80%;

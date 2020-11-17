@@ -1,12 +1,18 @@
 import { join } from 'path'
 import { SequelizeOptions } from 'sequelize-typescript'
+import { configValidator } from '@/validator/config'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const userConfig = require(join(process.cwd(), 'config.js'))
 
 export type AppConfig = typeof config
 
-// TODO: Some kind of validation
+const { error } = configValidator.validate(userConfig)
+
+if (error) {
+	throw error
+}
+
 export const config = {
 	port: userConfig.port as number,
 	static: userConfig.static as string,
@@ -16,6 +22,9 @@ export const config = {
 	canvas: {
 		width: userConfig.canvas.width as number,
 		height: userConfig.canvas.height as number,
+		palette: userConfig.canvas.palette.map((c: string) =>
+			c.toLowerCase()
+		) as string[],
 	},
 	drawing: {
 		pixels: (userConfig.drawing.pixels ?? 10) as number,

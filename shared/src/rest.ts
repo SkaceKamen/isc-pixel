@@ -2,6 +2,7 @@ export type CanvasInfo = {
 	width: number
 	height: number
 	path: string
+	palette: string[]
 }
 
 export type CaptchaFinishResponse = {

@@ -4,7 +4,7 @@ import { pixelValidator } from '../validator/pixel'
 import { asyncRoute } from '../async-route'
 
 export const pixelApi = appController(
-	(router, { canvas, bus, storage, sessions }) => {
+	(router, { canvas, bus, storage, sessions, config }) => {
 		let debounceTimeout = undefined as ReturnType<typeof setTimeout> | undefined
 
 		const debouncedSave = () => {
@@ -43,6 +43,19 @@ export const pixelApi = appController(
 
 				if (pixelData.y < 0 || pixelData.y >= canvas.height) {
 					throw new Error(`x is out of bounds`)
+				}
+
+				if (pixelData.color >= config.canvas.palette.length) {
+					throw new Error(`color is out of bounds`)
+				}
+
+				const color = parseInt(
+					config.canvas.palette[pixelData.color].substr(1),
+					16
+				)
+
+				if (Number.isNaN(color)) {
+					throw new Error(`Incorrect color`)
 				}
 
 				canvas.put(

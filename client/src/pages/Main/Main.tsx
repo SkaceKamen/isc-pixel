@@ -1,10 +1,11 @@
 import { Loader } from '@/components'
 import { useRest } from '@/context/RestContext'
-import { useAppStore, useDocumentEvent } from '@/utils/hooks'
+import { setCanvasState } from '@/store/modules/canvas'
+import { useAppDispatch, useAppStore, useDocumentEvent } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Controls } from './components/Controls'
+import { Controls } from './components/Controls/Controls'
 import { PaintCanvas } from './components/PaintCanvas'
 import { SessionModal } from './components/SessionModal'
 
@@ -13,6 +14,7 @@ type Props = {}
 export const Main = ({}: Props) => {
 	const rest = useRest()
 
+	const dispatch = useAppDispatch()
 	const session = useAppStore(state => state.session.id)
 
 	const [info, setInfo] = useState(undefined as CanvasInfo | undefined)
@@ -24,7 +26,17 @@ export const Main = ({}: Props) => {
 	}
 
 	useEffect(() => {
-		rest.getCanvasInfo().then(info => setInfo(info))
+		rest.getCanvasInfo().then(info => {
+			dispatch(
+				setCanvasState({
+					width: info.width,
+					height: info.height,
+					palette: info.palette.map(c => c.toLowerCase())
+				})
+			)
+
+			setInfo(info)
+		})
 	}, [])
 
 	useDocumentEvent('wheel', (e: WheelEvent) => {

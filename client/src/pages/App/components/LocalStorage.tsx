@@ -14,8 +14,7 @@ export const LocalStorage = ({}: Props) => {
 	const rest = useRest()
 
 	const session = useAppStore(state => state.session.id)
-	const favourites = useAppStore(state => state.canvas.favourites)
-	const color = useAppStore(state => state.canvas.color)
+	const selectedColor = useAppStore(state => state.canvas.selectedColor)
 
 	useEffect(() => {
 		const sessionStored = localStorage.getItem(SESSION_KEY)
@@ -40,9 +39,9 @@ export const LocalStorage = ({}: Props) => {
 
 		if (canvasStored) {
 			try {
-				const { favourites, color } = JSON.parse(canvasStored)
+				const { selectedColor } = JSON.parse(canvasStored)
 
-				dispatch(setCanvasState({ favourites, color }))
+				dispatch(setCanvasState({ selectedColor }))
 			} catch (e) {
 				console.error('Failed to load stored canvas options', e)
 			}
@@ -50,8 +49,8 @@ export const LocalStorage = ({}: Props) => {
 	}, [])
 
 	useEffect(() => {
-		localStorage.setItem(CANVAS_KEY, JSON.stringify({ color, favourites }))
-	}, [color, favourites])
+		localStorage.setItem(CANVAS_KEY, JSON.stringify({ selectedColor }))
+	}, [selectedColor])
 
 	useEffect(() => {
 		localStorage.setItem(SESSION_KEY, session ?? '')

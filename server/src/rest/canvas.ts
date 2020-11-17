@@ -17,6 +17,7 @@ export const canvasApi = appController((router, { canvas, config }) => {
 			width: config.canvas.width,
 			height: config.canvas.height,
 			path: '/canvas/image.png',
+			palette: config.canvas.palette,
 		} as CanvasInfo)
 	})
 })
