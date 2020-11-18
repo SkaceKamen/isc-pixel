@@ -50,14 +50,19 @@ export class WsSocket {
 		const client = new WsClient(this, s)
 		s.onclose = () => this.handleRemove(s)
 		this.clients.push(client)
-		client.send(this.serverInfo())
+		this.emitServerInfo()
 	}
 
 	handleRemove = (s: WebSocket) => {
 		this.clients = this.clients.filter((c) => c.socket !== s)
+		this.emitServerInfo()
+	}
+
+	emitServerInfo() {
+		const info = this.serverInfo()
 
 		this.clients.forEach((c) => {
-			c.send(this.serverInfo())
+			c.send(info)
 		})
 	}
 

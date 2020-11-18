@@ -1,6 +1,7 @@
 import { getWebsocketUrl } from '@/api/utils'
 import { WsClient } from '@/api/ws-client'
 import { ApiState, setApiState } from '@/store/modules/api'
+import { setServerState } from '@/store/modules/server'
 import { setSessionState } from '@/store/modules/session'
 import { useAppStore } from '@/utils/hooks'
 import React, { useContext, useEffect, useState } from 'react'
@@ -79,6 +80,14 @@ export const WsContextProvider = ({
 						pixelsReloadAt: session.reloadsAt
 							? new Date(session.reloadsAt)
 							: undefined
+					})
+				)
+			})
+
+			client.onInfo.on(info => {
+				dispatch(
+					setServerState({
+						info
 					})
 				)
 			})

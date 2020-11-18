@@ -1,5 +1,5 @@
 import { MyEvent } from '@/utils/events'
-import { Pixel, UserSessionInfo } from '@shared/models'
+import { Pixel, ServerInfo, UserSessionInfo } from '@shared/models'
 import { setSession, WsMessage, WsMessageType } from '@shared/ws'
 
 export class WsClient {
@@ -14,6 +14,7 @@ export class WsClient {
 
 	onPixel = new MyEvent<Pixel>()
 	onSession = new MyEvent<UserSessionInfo>()
+	onInfo = new MyEvent<ServerInfo>()
 
 	constructor(url: string, session?: string) {
 		this.url = url
@@ -56,13 +57,16 @@ export class WsClient {
 					break
 				}
 
-				/*
+				case WsMessageType.ServerInfo: {
+					this.onInfo.emit(msg.info)
+					break
+				}
+
 				default: {
 					throw new Error(
 						`Unknown message type: ${msg.type} (${WsMessageType[msg.type]})`
 					)
 				}
-				*/
 			}
 		}
 	}

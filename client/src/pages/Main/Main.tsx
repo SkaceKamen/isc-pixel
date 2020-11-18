@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { Controls } from './components/Controls/Controls'
 import { PaintCanvas } from './components/PaintCanvas'
 import { SessionModal } from './components/SessionModal'
+import { Social } from './components/Social/Social'
 import { Welcome } from './components/Welcome'
 
 type Props = {}
@@ -54,6 +55,7 @@ export const Main = ({}: Props) => {
 				<>
 					<Welcome />
 					<Controls onSessionRequested={handleSessionRequest} />
+					<Social />
 					<PaintCanvas
 						info={info}
 						zoom={zoom}

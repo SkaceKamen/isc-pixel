@@ -17,9 +17,9 @@ export const sessionApi = appController((router, { sessions, kaptcha }) => {
 
 			if (!session) {
 				res.status(404).send()
+			} else {
+				res.json(session)
 			}
-
-			res.json(session)
 		})
 	)
 
