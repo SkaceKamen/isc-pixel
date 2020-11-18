@@ -1,0 +1,7 @@
+PUBLISH BLOCKERS:
+ * Welcome screen
+ * Chat
+ * Online people counter
+
+LONG TERM:
+ * Registrations

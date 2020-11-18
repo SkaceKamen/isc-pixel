@@ -51,13 +51,15 @@ export const Controls = ({ onSessionRequested }: Props) => {
 
 	return (
 		<C>
-			{session && (
+			{session ? (
 				<>
 					{reloadsIn > 0 && <ReloadsIn>Wait {reloadsIn} s</ReloadsIn>}
 					<ButtonsRow>
 						<Palette />
 					</ButtonsRow>
 				</>
+			) : (
+				<ButtonsRow>Click anywhere to start painting</ButtonsRow>
 			)}
 		</C>
 	)

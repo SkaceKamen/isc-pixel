@@ -35,6 +35,8 @@ html, body, #application {
 body {
 	font-family: DogicaPixel, Arial, Helvetica, sans-serif;
 	color: ${colors.text};
+	font-size: 75%;
+	line-height: 150%;
 }
 
 body,html {

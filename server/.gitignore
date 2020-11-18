@@ -3,3 +3,4 @@ data/
 dist/server
 dist/shared
 dist/config.js
+dist/database.db

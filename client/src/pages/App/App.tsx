@@ -13,7 +13,7 @@ export const App = () => {
 	const apiState = useAppStore(state => state.api.state)
 
 	return (
-		<AppContainer id="stars">
+		<AppContainer>
 			<GlobalStyle />
 
 			<LocalStorage />
