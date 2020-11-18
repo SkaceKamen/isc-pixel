@@ -1,10 +1,12 @@
-import { Pixel, UserSessionInfo } from './models'
+import { Pixel, ServerInfo, UserSessionInfo } from './models'
 
 export enum WsMessageType {
 	NewPixel,
 	SessionChange,
-	ChatMessage,
+	IncomingChatMessage,
+	SendChatMessage,
 	SetSession,
+	ServerInfo,
 }
 
 export const newPixel = (pixel: Pixel) =>
@@ -25,7 +27,29 @@ export const setSession = (session: string) =>
 		session,
 	} as const)
 
+export const serverInfo = (info: ServerInfo) =>
+	({
+		type: WsMessageType.ServerInfo,
+		info,
+	} as const)
+
+export const sendChatMessage = (message: string) =>
+	({
+		type: WsMessageType.SendChatMessage,
+		message,
+	} as const)
+
+export const incomingChatMessage = (from: string, message: string) =>
+	({
+		type: WsMessageType.IncomingChatMessage,
+		from,
+		message,
+	} as const)
+
 export type WsMessage =
 	| ReturnType<typeof newPixel>
 	| ReturnType<typeof sessionChange>
 	| ReturnType<typeof setSession>
+	| ReturnType<typeof serverInfo>
+	| ReturnType<typeof incomingChatMessage>
+	| ReturnType<typeof sendChatMessage>

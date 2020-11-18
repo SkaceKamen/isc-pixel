@@ -5,7 +5,7 @@ import WebSocket from 'ws'
 import { AppContext } from '../context'
 import { Pixel } from '@shared/models'
 import { WsClient } from './ws-client'
-import { newPixel, sessionChange } from '@shared/ws'
+import { newPixel, serverInfo, sessionChange } from '@shared/ws'
 
 export class WsSocket {
 	socket: WebSocket.Server
@@ -50,9 +50,20 @@ export class WsSocket {
 		const client = new WsClient(this, s)
 		s.onclose = () => this.handleRemove(s)
 		this.clients.push(client)
+		client.send(this.serverInfo())
 	}
 
 	handleRemove = (s: WebSocket) => {
 		this.clients = this.clients.filter((c) => c.socket !== s)
+
+		this.clients.forEach((c) => {
+			c.send(this.serverInfo())
+		})
+	}
+
+	serverInfo() {
+		return serverInfo({
+			users: this.clients.length,
+		})
 	}
 }

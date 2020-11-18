@@ -10,3 +10,7 @@ export type UserSessionInfo = {
 	reloadsAt?: number
 	expiresAt: number
 }
+
+export type ServerInfo = {
+	users: number
+}
