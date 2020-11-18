@@ -3,14 +3,14 @@ import { useRest } from '@/context/RestContext'
 import { useWs } from '@/context/WsContext'
 import { CanvasTool, setCanvasState } from '@/store/modules/canvas'
 import { setSessionState } from '@/store/modules/session'
-import { hexToRgb, intToRGBA, rgbToHex } from '@/utils/color'
+import { hexToRgb, rgbToHex } from '@/utils/color'
 import { relativeMousePosition } from '@/utils/dom'
-import { useAppDispatch, useAppStore } from '@/utils/hooks'
-import { CanvasInfo } from '@shared/rest'
+import { useAnimation, useAppDispatch, useAppStore } from '@/utils/hooks'
 import { Pixel } from '@shared/models'
+import { CanvasInfo } from '@shared/rest'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import pickerIcon from '@/assets/picker-icon.png'
+import { Cursor } from './Cursor'
 
 type Props = {
 	info: CanvasInfo
@@ -48,6 +48,8 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	})
 
 	const [actualZoom, setActualZoom] = useState(zoom)
+
+	const anim = useAnimation('click-animation', 200)
 
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -99,6 +101,8 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 				if (pixels <= 0 || paletteIndexAt(x, y) === selectedColor) {
 					return
 				}
+
+				anim.trigger()
 
 				const res = await rest.putPixel(x, y, selectedColor)
 
@@ -242,35 +246,14 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 				>
 					<StyledCanvas ref={canvasRef} />
 				</Scale>
-				<ClickPreview
-					style={{
-						transform: `translate(
-							${info.width / 2 + (mousePos.x - info.width / 2) * actualZoom}px,
-							${info.height / 2 + (mousePos.y - info.height / 2) * actualZoom}px)`,
-						width: zoom,
-						height: zoom
-					}}
-				>
-					{tool === CanvasTool.Pick && (
-						<Icon
-							style={{
-								transform: 'translate(-110%,-110%)'
-							}}
-						>
-							<img src={pickerIcon} />
-						</Icon>
-					)}
-					{zoom > 10 && (
-						<Position
-							style={{
-								top: zoom,
-								left: zoom * 1.5
-							}}
-						>
-							{mousePos.x},{mousePos.y}
-						</Position>
-					)}
-				</ClickPreview>
+				<Cursor
+					x={info.width / 2 + (mousePos.x - info.width / 2) * actualZoom}
+					y={info.height / 2 + (mousePos.y - info.height / 2) * actualZoom}
+					zoom={actualZoom}
+					mousePos={mousePos}
+					tool={tool}
+					animation={anim.className}
+				/>
 			</Translate>
 		</CanvasContainer>
 	)
@@ -307,26 +290,4 @@ const StyledCanvas = styled.canvas`
 	image-rendering: -o-crisp-edges;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
-`
-
-const ClickPreview = styled.div`
-	position: absolute;
-	top: 0;
-	left: 0;
-	border: 1px solid #000;
-	pointer-events: none;
-	box-sizing: border-box;
-`
-
-const Position = styled.div`
-	text-shadow: 1px 1px 0 #000;
-	color: #fff;
-	position: absolute;
-	font-size: 8px;
-`
-
-const Icon = styled.div`
-	text-shadow: 1px 1px 0 #000;
-	color: #fff;
-	position: absolute;
 `

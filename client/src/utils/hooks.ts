@@ -6,6 +6,7 @@ import {
 	EffectCallback,
 	useCallback,
 	useEffect,
+	useMemo,
 	useRef,
 	useState
 } from 'react'
@@ -240,4 +241,32 @@ export const useChange = (effect: EffectCallback, deps?: DependencyList) => {
 			mounted.current = true
 		}
 	}, deps)
+}
+
+export const useAnimation = (className: string, duration: number) => {
+	const [active, setActive] = useState(false)
+
+	const timeout = useRef(undefined as ReturnType<typeof setTimeout> | undefined)
+
+	const controls = useRef({
+		trigger: () => {
+			if (timeout.current !== undefined) {
+				clearTimeout(timeout.current)
+			}
+
+			setActive(true)
+
+			timeout.current = setTimeout(() => {
+				setActive(false)
+				timeout.current = undefined
+			}, duration)
+		},
+		className: undefined as string | undefined,
+		active: false
+	})
+
+	controls.current.className = active ? className : undefined
+	controls.current.active = active
+
+	return controls.current
 }
