@@ -1,7 +1,12 @@
 PUBLISH BLOCKERS:
- * Welcome screen
- * Chat
- * Online people counter
+	* Welcome screen
+		* Add social links (Discord, FB)
+		* Add ISC logo
+	* RestClient needs to properly recognize invalid responses
+		* Show error for unknown error
+		* Erase session if it's invalid
 
 LONG TERM:
- * Registrations
+	* Something wrong with zooming :(
+	* Chat
+	* Registrations
