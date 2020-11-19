@@ -54,7 +54,7 @@ export const Main = ({}: Props) => {
 			{info ? (
 				<>
 					<Welcome />
-					<Controls onSessionRequested={handleSessionRequest} />
+					<Controls />
 					<Social />
 					<PaintCanvas
 						info={info}

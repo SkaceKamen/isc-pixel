@@ -1,4 +1,5 @@
 PUBLISH BLOCKERS:
+	* Timelapse creator
 	* Welcome screen
 		* Add social links (Discord, FB)
 		* Add ISC logo

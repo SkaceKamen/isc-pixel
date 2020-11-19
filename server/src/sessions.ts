@@ -1,7 +1,7 @@
-import { v4 as uuidv4 } from 'uuid'
-import { hours, minutes, seconds } from './lib/time'
 import { UserSessionInfo } from '@shared/models'
+import { v4 as uuidv4 } from 'uuid'
 import { AppContext } from './context'
+import { hours, seconds } from './lib/time'
 import { UserSession } from './models/db/user-session'
 import { userSessionToInfo } from './serializers/user-session'
 
@@ -18,8 +18,19 @@ export class Sessions {
 		return this._context
 	}
 
-	initialize(context: AppContext) {
+	async initialize(context: AppContext) {
 		this._context = context
+
+		const existing = await UserSession.findAll()
+
+		existing.forEach((session) => {
+			if (session.reloadsAt) {
+				setTimeout(
+					this.refreshSessionAction(session),
+					Math.max(0, session.reloadsAt.getTime() - Date.now())
+				)
+			}
+		})
 
 		return this
 	}
@@ -64,6 +75,11 @@ export class Sessions {
 			session.reloadsAt = new Date(
 				Date.now() + seconds(this.context.config.drawing.timeout)
 			)
+
+			setTimeout(
+				this.refreshSessionAction(session),
+				seconds(this.context.config.drawing.timeout)
+			)
 		}
 
 		await session.save()
@@ -71,38 +87,12 @@ export class Sessions {
 		this.context.bus.sessionChanged.dispatch(userSessionToInfo(session))
 	}
 
-	start() {
-		if (this.interval) {
-			this.stop()
-		}
+	refreshSessionAction = (session: UserSession) => async () => {
+		session.pixels = this.context.config.drawing.pixels
+		session.reloadsAt = (null as unknown) as undefined
 
-		this.interval = setInterval(() => this.tick(), 500)
-	}
+		await session.save()
 
-	stop() {
-		if (this.interval) {
-			clearInterval(this.interval)
-
-			this.interval = undefined
-		}
-	}
-
-	async tick() {
-		const items = await UserSession.findAll()
-
-		items.forEach(async (item) => {
-			if (Date.now() >= item.expiresAt.getTime()) {
-				item.destroy()
-			} else {
-				if (item.reloadsAt && Date.now() >= item.reloadsAt?.getTime()) {
-					item.pixels = this.context.config.drawing.pixels
-					item.reloadsAt = (null as unknown) as undefined
-
-					await item.save()
-
-					this.context.bus.sessionChanged.dispatch(userSessionToInfo(item))
-				}
-			}
-		})
+		this.context.bus.sessionChanged.dispatch(userSessionToInfo(session))
 	}
 }

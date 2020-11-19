@@ -9,11 +9,9 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Palette } from './components/Palette'
 
-type Props = {
-	onSessionRequested: () => void
-}
+type Props = {}
 
-export const Controls = ({ onSessionRequested }: Props) => {
+export const Controls = () => {
 	const dispatch = useAppDispatch()
 	const session = useAppStore(state => state.session.id)
 	const pixels = useAppStore(state => state.session.pixels)
@@ -22,7 +20,7 @@ export const Controls = ({ onSessionRequested }: Props) => {
 	const [reloadsIn, setReloadsIn] = useState(0)
 
 	useWindowEvent('keydown', (e: KeyboardEvent) => {
-		if (e.key === 'Control') {
+		if (!e.repeat && e.key === 'Control') {
 			dispatch(setCanvasState({ tool: CanvasTool.Pick }))
 		}
 	})
