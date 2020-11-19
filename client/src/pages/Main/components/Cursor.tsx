@@ -59,11 +59,7 @@ const ClickPreview = styled.div`
 	border: 1px solid #000;
 	pointer-events: none;
 	box-sizing: border-box;
-	animation-duration: 200ms;
-	animation-name: ${() =>
-		css`
-			${usedAnimation}
-		`};
+	user-select: none;
 `
 
 const Position = styled.div`
