@@ -2,6 +2,7 @@ type State = Readonly<typeof initialState>
 
 export enum ApiState {
 	Connecting = 1,
+	Reconnecting,
 	Connected,
 	Error
 }

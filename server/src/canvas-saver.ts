@@ -1,10 +1,14 @@
 import { AppContext } from './context'
+import { minutes } from './lib/time'
 
 export class CanvasSaver {
 	private context: AppContext
 	private handle?: ReturnType<typeof setInterval>
 
 	private interval: number
+
+	private takeSnapshot = false
+	private lastSnapshot = 0
 
 	constructor(context: AppContext, interval = 10000) {
 		this.context = context
@@ -25,8 +29,21 @@ export class CanvasSaver {
 				await this.context.storage.saveCanvas(await this.context.canvas.png())
 
 				this.context.canvas.dirty = false
+				this.takeSnapshot = true
 			} catch (e) {
 				console.error('Failed to save canvas!')
+				console.error(e)
+			}
+		}
+
+		if (this.takeSnapshot && this.lastSnapshot < Date.now() - minutes(5)) {
+			try {
+				await this.context.storage.saveSnapshot(await this.context.canvas.png())
+
+				this.takeSnapshot = false
+				this.lastSnapshot = Date.now()
+			} catch (e) {
+				console.error('Failed to save canvas snapshot!')
 				console.error(e)
 			}
 		}

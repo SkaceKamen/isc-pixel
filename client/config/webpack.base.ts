@@ -124,7 +124,7 @@ const config = (env: ENV): webpack.Configuration => {
 					]
 				},
 				{
-					test: /\.(jpg|png)$/,
+					test: /\.(jpg|png|svg)$/,
 					loader: 'file-loader',
 					options: {
 						name: 'images/[path][name].[ext]'

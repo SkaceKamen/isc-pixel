@@ -3,7 +3,7 @@ import { useWindowEvent } from '@/utils/hooks'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { darken, rgba } from 'polished'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import ReactDOM from 'react-dom'
 import styled, { css, keyframes, Keyframes } from 'styled-components'
 import { Body, Footer, Header } from './styles'
@@ -67,6 +67,7 @@ export const Modal = ({
 
 			setTimeout(() => {
 				onClose && onClose()
+				setIsClosing(false)
 			}, 150)
 		}
 	}

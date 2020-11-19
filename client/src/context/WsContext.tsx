@@ -52,16 +52,20 @@ export const WsContextProvider = ({
 
 			client.onClose = () => {
 				if (reconnectCount < 5) {
+					setReconnectCount(reconnectCount + 1)
+
 					dispatch(
 						setApiState({
-							state: ApiState.Connecting
+							state: ApiState.Reconnecting
 						})
 					)
 
-					setReconnectCount(reconnectCount + 1)
-
 					setTimeout(() => {
-						client.connect()
+						dispatch(
+							setApiState({
+								state: ApiState.Connecting
+							})
+						)
 					}, 100 + reconnectCount * 300)
 				} else {
 					dispatch(

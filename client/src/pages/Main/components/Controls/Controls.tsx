@@ -64,12 +64,6 @@ export const Controls = () => {
 }
 
 const C = styled.div`
-	position: absolute;
-	left: 50%;
-	bottom: 0;
-	z-index: 1;
-	width: 400px;
-	margin-left: -200px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

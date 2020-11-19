@@ -53,9 +53,19 @@ export const Main = ({}: Props) => {
 		<MainContainer>
 			{info ? (
 				<>
-					<Welcome />
-					<Controls />
-					<Social />
+					<ScreenCenter>
+						<Flexed>
+							<Small style={{ marginLeft: 'auto' }}>
+								<Welcome />
+							</Small>
+							<Big>
+								<Controls />
+							</Big>
+							<Small style={{ marginRight: 'auto' }}>
+								<Social />
+							</Small>
+						</Flexed>
+					</ScreenCenter>
 					<PaintCanvas
 						info={info}
 						zoom={zoom}
@@ -77,4 +87,26 @@ const MainContainer = styled.div`
 	height: 100%;
 	overflow: hidden;
 	position: relative;
+`
+
+const ScreenCenter = styled.div`
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 700px;
+	margin-left: -350px;
+	z-index: 1;
+`
+
+const Flexed = styled.div`
+	display: flex;
+	align-items: flex-end;
+`
+
+const Small = styled.div`
+	flex: 1;
+`
+
+const Big = styled.div`
+	margin: 0 1rem;
 `

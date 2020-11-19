@@ -1,8 +1,5 @@
 PUBLISH BLOCKERS:
-	* Timelapse creator
-	* Welcome screen
-		* Add social links (Discord, FB)
-		* Add ISC logo
+	* Supply server info from config.js
 	* RestClient needs to properly recognize invalid responses
 		* Show error for unknown error
 		* Erase session if it's invalid

@@ -11,11 +11,9 @@ export const Social = ({}: Props) => {
 }
 
 const C = styled.div`
-	position: absolute;
-	bottom: 0;
-	right: 0;
 	padding: 0.5rem;
 	background-color: rgba(0, 0, 0, 0.75);
-	z-index: 1;
 	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	text-align: center;
 `
