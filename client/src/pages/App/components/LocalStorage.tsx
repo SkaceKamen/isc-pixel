@@ -22,7 +22,7 @@ export const LocalStorage = ({}: Props) => {
 		const sessionStored = localStorage.getItem(SESSION_KEY)
 
 		if (sessionStored) {
-			catchErrors(() => rest.getSession(sessionStored)).then(info => {
+			catchErrors(rest.getSession(sessionStored)).then(info => {
 				if (info) {
 					dispatch(
 						setSessionState({

@@ -5,7 +5,7 @@ import { useAppDispatch } from '@/utils/hooks'
 import React, { useCallback, useContext } from 'react'
 
 type Handler = {
-	catchErrors: <T>(cb: () => Promise<T>) => Promise<T | undefined>
+	catchErrors: <T>(cb: Promise<T>) => Promise<T | undefined>
 }
 
 export const ErrorHandlerContext = React.createContext<Handler | null>(null)
@@ -17,9 +17,9 @@ export const ErrorHandlerContextProvider = ({
 }) => {
 	const dispatch = useAppDispatch()
 
-	const catchErrors = useCallback(async <T,>(cb: () => Promise<T>) => {
+	const catchErrors = useCallback(async <T,>(cb: Promise<T>) => {
 		try {
-			return await cb()
+			return await cb
 		} catch (e) {
 			if (e instanceof InvalidResponseError) {
 				if (e.res.status === 401) {

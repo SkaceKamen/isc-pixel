@@ -23,7 +23,7 @@ export const SessionModal = ({ onClose }: Props) => {
 	const loadSession = async () => {
 		setLoading(true)
 
-		const res = await catchErrors(() => rest.requestSession())
+		const res = await catchErrors(rest.requestSession())
 
 		if (res) {
 			setCaptcha(res.captcha)
@@ -39,7 +39,7 @@ export const SessionModal = ({ onClose }: Props) => {
 
 		setLoading(true)
 
-		const res = await catchErrors(() =>
+		const res = await catchErrors(
 			rest.requestSessionFromCaptcha({
 				captcha,
 				results

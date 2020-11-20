@@ -98,7 +98,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 
 				anim.trigger()
 
-				const res = await catchErrors(() => rest.putPixel(x, y, selectedColor))
+				const res = await catchErrors(rest.putPixel(x, y, selectedColor))
 
 				if (res) {
 					dispatch(

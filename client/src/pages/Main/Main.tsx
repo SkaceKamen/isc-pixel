@@ -30,7 +30,7 @@ export const Main = ({}: Props) => {
 	}
 
 	useEffect(() => {
-		catchErrors(() => rest.getCanvasInfo()).then(info => {
+		catchErrors(rest.getCanvasInfo()).then(info => {
 			if (info) {
 				dispatch(
 					setCanvasState({
