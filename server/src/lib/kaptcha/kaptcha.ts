@@ -60,7 +60,7 @@ export class Kaptcha {
 	constructor({
 		model,
 		steps = 2,
-		alphabet = 'ABCHKLMNOSTUVYZ',
+		alphabet = 'ABHKLMNOSTUVYZ4567',
 		font1,
 		font2,
 		random = new DefaultKaptchaRandomModel(),
@@ -106,9 +106,14 @@ export class Kaptcha {
 			throw new Error('Invalid step')
 		}
 
-		const font1 = await Jimp.loadFont(this.font2)
+		const font1 = await Jimp.loadFont(this.font1)
+		const font2 = await Jimp.loadFont(this.font2)
+
+		const font =
+			this.random.get('main-letter-font-prompt') > 0.5 ? font2 : font1
+
 		const letter = this.targetLetter(record, step)
-		const letterImage = await this.createRandomLetterImage(font1, letter)
+		const letterImage = await this.createRandomLetterImage(font, letter)
 
 		const width = letterImage.getWidth()
 		const height = letterImage.getHeight()
@@ -246,7 +251,7 @@ export class Kaptcha {
 		const font = this.random.get('main-letter-font') > 0.5 ? font2 : font1
 		const main = await this.createRandomLetterImage(font, targetLetter, true)
 
-		main.fade(0.3 + this.random.get('letter-fade') * 0.1)
+		main.fade(0.3)
 
 		image.blit(
 			main,
