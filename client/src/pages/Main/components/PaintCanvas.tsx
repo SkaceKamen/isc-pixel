@@ -11,6 +11,7 @@ import { CanvasInfo } from '@shared/rest'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Cursor } from './Cursor'
+import background from '@/assets/background.png'
 
 type Props = {
 	info: CanvasInfo
@@ -43,8 +44,8 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
 	const [offset, setOffset] = useState({
-		x: 0,
-		y: 0
+		x: window.innerWidth / 2 - info.width / 2,
+		y: window.innerHeight / 2 - info.height / 2
 	})
 
 	const [actualZoom, setActualZoom] = useState(zoom)
@@ -264,6 +265,7 @@ const CanvasContainer = styled.div`
 	height: 100%;
 	position: relative;
 	user-select: none;
+	background: url('${background}');
 `
 
 const Translate = styled.div`
@@ -280,6 +282,7 @@ const Scale = styled.div`
 	image-rendering: -o-crisp-edges;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
+	box-shadow: 0px 0px 10px #333;
 `
 
 const StyledCanvas = styled.canvas`
