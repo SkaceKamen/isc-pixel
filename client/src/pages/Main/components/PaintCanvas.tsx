@@ -12,6 +12,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Cursor } from './Cursor'
 import background from '@/assets/background.png'
+import { off } from 'process'
 
 type Props = {
 	info: CanvasInfo
@@ -149,13 +150,15 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		const x = Math.floor(pos.x / zoom)
 		const y = Math.floor(pos.y / zoom)
 
-		mouseRef.current = {
-			...mouseRef.current,
-			x,
-			y
-		}
+		if (e.target instanceof HTMLCanvasElement) {
+			mouseRef.current = {
+				...mouseRef.current,
+				x,
+				y
+			}
 
-		setMousePos({ x, y })
+			setMousePos({ x, y })
+		}
 
 		if (dragRef.current.dragging) {
 			setOffset({
@@ -225,7 +228,17 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	}, [zoom])
 
 	return (
-		<CanvasContainer>
+		<CanvasContainer
+			onMouseDown={handleMouseDown}
+			onMouseUp={handleMouseUp}
+			onMouseMove={handleMouseMove}
+			onContextMenu={blockContext}
+			style={{
+				backgroundPosition: `${offset.x}px ${offset.y}px`,
+				backgroundSize: `${(actualZoom / 1) * 128}px ${(actualZoom / 1) *
+					128}px`
+			}}
+		>
 			<Translate
 				style={{
 					transform: `translate(${offset.x}px, ${offset.y}px)`,
@@ -240,10 +253,6 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 						height: info.height
 					}}
 					onClick={handleClick}
-					onMouseDown={handleMouseDown}
-					onMouseUp={handleMouseUp}
-					onMouseMove={handleMouseMove}
-					onContextMenu={blockContext}
 				>
 					<StyledCanvas ref={canvasRef} />
 				</Scale>
