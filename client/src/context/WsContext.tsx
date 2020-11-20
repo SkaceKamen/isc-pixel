@@ -39,10 +39,6 @@ export const WsContextProvider = ({
 			client.onOpen = () => {
 				setReconnectCount(0)
 
-				if (session) {
-					client.send
-				}
-
 				dispatch(
 					setApiState({
 						state: ApiState.Connected

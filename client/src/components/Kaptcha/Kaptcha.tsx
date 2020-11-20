@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import styled from 'styled-components'
 
 type Props = {
 	id: string
@@ -35,16 +36,17 @@ export const Kaptcha = ({ baseUrl = '', id, steps = 2, onFinish }: Props) => {
 
 	return step < steps ? (
 		<>
-			<div>
+			<Step>
 				Step {step + 1} / {steps}
-			</div>
-			<div>
-				Find this letter:{' '}
+			</Step>
+			<Prompt>
+				Find
 				<img
 					src={`${baseUrl}${id}/${step}/prompt.jpg?t=${unique}`}
 					alt="Captcha prompt"
 				/>
-			</div>
+				in the image:
+			</Prompt>
 			<img
 				onClick={handleClick}
 				src={`${baseUrl}${id}/${step}/image.jpg?t=${unique}`}
@@ -55,3 +57,17 @@ export const Kaptcha = ({ baseUrl = '', id, steps = 2, onFinish }: Props) => {
 		<></>
 	)
 }
+
+const Step = styled.div`
+	text-align: center;
+`
+
+const Prompt = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	img {
+		margin: 0.5rem;
+	}
+`

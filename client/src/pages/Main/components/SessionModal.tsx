@@ -60,17 +60,14 @@ export const SessionModal = ({ onClose }: Props) => {
 	}, [])
 
 	return (
-		<Modal open={true} onClose={onClose}>
+		<Modal open={true} onClose={onClose} header={<h2>Are you human?</h2>}>
 			<Loader loaded={!loading} />
 			{captcha && (
-				<>
-					<p>Solve this puzzle</p>
-					<Kaptcha
-						baseUrl={`${getRestUrl()}/captcha/`}
-						id={captcha}
-						onFinish={handleFinish}
-					/>
-				</>
+				<Kaptcha
+					baseUrl={`${getRestUrl()}/captcha/`}
+					id={captcha}
+					onFinish={handleFinish}
+				/>
 			)}
 		</Modal>
 	)
