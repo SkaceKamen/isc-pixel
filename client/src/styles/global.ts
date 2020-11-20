@@ -1,8 +1,8 @@
+import { darken } from 'polished'
 import { createGlobalStyle } from 'styled-components'
 import colors from './colors'
 import input from './components/input'
 import reset from './components/reset'
-import { media } from './media'
 import transitions from './components/transitions'
 
 export const GlobalStyle = createGlobalStyle`
@@ -43,12 +43,6 @@ body,html {
 	overflow: hidden;
 }
 
-${media.medium} {
-  html, body, button {
-    font-size: 85%;
-  }
-}
-
 ${input}
 ${transitions}
 
@@ -74,5 +68,15 @@ button, a {
 	image-rendering: -o-crisp-edges;
 	image-rendering: pixelated;
 	image-rendering: crisp-edges;
+}
+
+h3 {
+	margin: 1rem 0 0.5rem 0;
+	color: ${darken(0.2, colors.text)};
+	font-size: 115%;
+}
+
+b {
+	color: ${colors.highlightText};
 }
 `

@@ -10,9 +10,9 @@ import { Pixel } from '@shared/models'
 import { CanvasInfo } from '@shared/rest'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { Cursor } from './Cursor'
+import { Cursor } from './components/Cursor'
 import background from '@/assets/background.png'
-import { off } from 'process'
+import { SideText } from './components/SideText'
 
 type Props = {
 	info: CanvasInfo
@@ -42,6 +42,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		zoom
 	})
 
+	const [dragging, setDragging] = useState(false)
 	const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
 	const [offset, setOffset] = useState({
@@ -122,7 +123,9 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	}
 
 	const handleMouseDown = (e: React.MouseEvent) => {
-		if (e.button === 2) {
+		if (e.button === 2 || e.button === 1) {
+			setDragging(true)
+
 			dragRef.current = {
 				dragging: true,
 				start: {
@@ -134,7 +137,9 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	}
 
 	const handleMouseUp = (e: React.MouseEvent) => {
-		if (e.button === 2) {
+		if (e.button === 2 || e.button === 1) {
+			setDragging(false)
+
 			dragRef.current = {
 				dragging: false,
 				start: {
@@ -247,14 +252,17 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 				}}
 			>
 				<Scale
+					className="pixel-perfect"
 					style={{
 						transform: `scale(${actualZoom})`,
 						width: info.width,
-						height: info.height
+						height: info.height,
+						cursor: dragging ? 'move' : undefined
 					}}
 					onClick={handleClick}
 				>
-					<StyledCanvas ref={canvasRef} />
+					<StyledCanvas className="pixel-perfect" ref={canvasRef} />
+					<SideText />
 				</Scale>
 				<Cursor
 					x={info.width / 2 + (mousePos.x - info.width / 2) * actualZoom}
@@ -283,24 +291,7 @@ const Translate = styled.div`
 
 const Scale = styled.div`
 	cursor: crosshair;
-	image-rendering: optimizeSpeed;
-	-ms-interpolation-mode: nearest-neighbor;
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: -webkit-crisp-edges;
-	image-rendering: -moz-crisp-edges;
-	image-rendering: -o-crisp-edges;
-	image-rendering: pixelated;
-	image-rendering: crisp-edges;
 	box-shadow: 0px 0px 10px #333;
 `
 
-const StyledCanvas = styled.canvas`
-	image-rendering: optimizeSpeed;
-	-ms-interpolation-mode: nearest-neighbor;
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: -webkit-crisp-edges;
-	image-rendering: -moz-crisp-edges;
-	image-rendering: -o-crisp-edges;
-	image-rendering: pixelated;
-	image-rendering: crisp-edges;
-`
+const StyledCanvas = styled.canvas``

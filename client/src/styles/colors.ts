@@ -13,6 +13,8 @@ export default {
 	application,
 	text,
 
+	highlightText: warn,
+
 	background: rgba(application, 0.8),
 	border: rgba(lighten(0.1, application), 0.8),
 

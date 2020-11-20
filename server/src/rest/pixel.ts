@@ -58,11 +58,7 @@ export const pixelApi = appController(
 					throw new Error(`Incorrect color`)
 				}
 
-				canvas.put(
-					pixelData.x | 0,
-					pixelData.y | 0,
-					pixelData.color * 0x100 + 0xff
-				)
+				canvas.put(pixelData.x | 0, pixelData.y | 0, color * 0x100 + 0xff)
 
 				bus.newPixel.dispatch(pixelData)
 
