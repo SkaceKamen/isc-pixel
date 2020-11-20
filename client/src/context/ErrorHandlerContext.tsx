@@ -21,12 +21,7 @@ export const ErrorHandlerContextProvider = ({
 		try {
 			return await cb()
 		} catch (e) {
-			console.log(e)
-			console.log(e instanceof InvalidResponseError)
-
 			if (e instanceof InvalidResponseError) {
-				console.log(e.res.status)
-
 				if (e.res.status === 401) {
 					dispatch(
 						setSessionState({
