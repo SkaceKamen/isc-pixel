@@ -1,4 +1,5 @@
 import { Loader } from '@/components'
+import { useErrorHandler } from '@/context/ErrorHandlerContext'
 import { useRest } from '@/context/RestContext'
 import { setCanvasState } from '@/store/modules/canvas'
 import { useAppDispatch, useAppStore, useDocumentEvent } from '@/utils/hooks'
@@ -18,6 +19,7 @@ export const Main = ({}: Props) => {
 
 	const dispatch = useAppDispatch()
 	const session = useAppStore(state => state.session.id)
+	const { catchErrors } = useErrorHandler()
 
 	const [info, setInfo] = useState(undefined as CanvasInfo | undefined)
 	const [zoom, setZoom] = useState(3)
@@ -28,16 +30,18 @@ export const Main = ({}: Props) => {
 	}
 
 	useEffect(() => {
-		rest.getCanvasInfo().then(info => {
-			dispatch(
-				setCanvasState({
-					width: info.width,
-					height: info.height,
-					palette: info.palette.map(c => c.toLowerCase())
-				})
-			)
+		catchErrors(() => rest.getCanvasInfo()).then(info => {
+			if (info) {
+				dispatch(
+					setCanvasState({
+						width: info.width,
+						height: info.height,
+						palette: info.palette.map(c => c.toLowerCase())
+					})
+				)
 
-			setInfo(info)
+				setInfo(info)
+			}
 		})
 	}, [])
 

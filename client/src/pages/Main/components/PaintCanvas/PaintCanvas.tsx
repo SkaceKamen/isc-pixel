@@ -1,17 +1,24 @@
 import { getRestUrl } from '@/api/utils'
+import background from '@/assets/background.png'
+import { useErrorHandler } from '@/context/ErrorHandlerContext'
 import { useRest } from '@/context/RestContext'
 import { useWs } from '@/context/WsContext'
 import { CanvasTool, setCanvasState } from '@/store/modules/canvas'
 import { setSessionState } from '@/store/modules/session'
-import { hexToRgb, rgbToHex } from '@/utils/color'
+import { hexToRgb } from '@/utils/color'
 import { relativeMousePosition } from '@/utils/dom'
-import { useAnimation, useAppDispatch, useAppStore } from '@/utils/hooks'
+import {
+	useAnimation,
+	useAppDispatch,
+	useAppStore,
+	useWindowEvent
+} from '@/utils/hooks'
 import { Pixel } from '@shared/models'
 import { CanvasInfo } from '@shared/rest'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import { useCanvas } from './canvas'
 import { Cursor } from './components/Cursor'
-import background from '@/assets/background.png'
 import { SideText } from './components/SideText'
 
 type Props = {
@@ -24,6 +31,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	const rest = useRest()
 	const ws = useWs()
 	const dispatch = useAppDispatch()
+	const { catchErrors } = useErrorHandler()
 
 	const session = useAppStore(state => state.session.id)
 	const pixels = useAppStore(state => state.session.pixels)
@@ -55,31 +63,14 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	const anim = useAnimation('click-animation', 200)
 
 	const canvasRef = useRef<HTMLCanvasElement>(null)
+	const canvas = useCanvas(canvasRef)
 
+	// Calculate pixel index at specified position
 	const paletteIndexAt = (x: number, y: number) => {
-		if (!canvasRef.current) {
-			console.warn('Palette index requested before canvas is initialized')
-
-			return -1
-		}
-
-		const ctx = canvasRef.current.getContext('2d')
-
-		if (!ctx) {
-			throw new Error('Failed to get 2D context')
-		}
-
-		const data = ctx.getImageData(x, y, 1, 1).data
-		const color = '#' + rgbToHex(data[0], data[1], data[2])
-		const index = palette.indexOf(color)
-
-		if (index < 0) {
-			console.warn('Color', color, 'has no index in palette', palette)
-		}
-
-		return index
+		return canvas.colorIndexAt(x, y, palette)
 	}
 
+	// User clicked canvas
 	const handleClick = async (e: React.MouseEvent) => {
 		if (!session) {
 			onSessionRequested()
@@ -107,21 +98,26 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 
 				anim.trigger()
 
-				const res = await rest.putPixel(x, y, selectedColor)
+				const res = await catchErrors(() => rest.putPixel(x, y, selectedColor))
 
-				dispatch(
-					setSessionState({
-						id: res.id,
-						pixels: res.pixels,
-						pixelsReloadAt: res.reloadsAt ? new Date(res.reloadsAt) : undefined
-					})
-				)
+				if (res) {
+					dispatch(
+						setSessionState({
+							id: res.id,
+							pixels: res.pixels,
+							pixelsReloadAt: res.reloadsAt
+								? new Date(res.reloadsAt)
+								: undefined
+						})
+					)
+				}
 
 				break
 			}
 		}
 	}
 
+	// Dragging handler - mouse down
 	const handleMouseDown = (e: React.MouseEvent) => {
 		if (e.button === 2 || e.button === 1) {
 			setDragging(true)
@@ -136,7 +132,8 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		}
 	}
 
-	const handleMouseUp = (e: React.MouseEvent) => {
+	// Dragging handler - mouse up
+	useWindowEvent('mouseup', (e: MouseEvent) => {
 		if (e.button === 2 || e.button === 1) {
 			setDragging(false)
 
@@ -148,8 +145,9 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 				}
 			}
 		}
-	}
+	})
 
+	// Dragging and mouse position handler
 	const handleMouseMove = (e: React.MouseEvent) => {
 		const pos = relativeMousePosition(e)
 		const x = Math.floor(pos.x / zoom)
@@ -173,25 +171,21 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		}
 	}
 
+	// Stop context menu - handled in mouseDown
 	const blockContext = (e: React.MouseEvent) => {
 		e.preventDefault()
 	}
 
-	const handlePixel = useCallback((pixel: Pixel) => {
-		const ctx = canvasRef.current?.getContext('2d')
-
-		if (ctx) {
+	// Handle new pixels from WS
+	const handlePixel = useCallback(
+		(pixel: Pixel) => {
 			const color = hexToRgb(palette[pixel.color].substr(1))
-			const id = ctx.createImageData(1, 1)
-			const d = id.data
-			d[0] = color.r
-			d[1] = color.g
-			d[2] = color.b
-			d[3] = 255
-			ctx.putImageData(id, pixel.x, pixel.y)
-		}
-	}, [])
+			canvas.setPixel(pixel.x, pixel.y, color)
+		},
+		[canvas]
+	)
 
+	// Load the initial canvas
 	useEffect(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current
@@ -210,6 +204,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		}
 	}, [info])
 
+	// Hook the pixel handler
 	useEffect(() => {
 		ws.onPixel.on(handlePixel)
 
@@ -218,6 +213,7 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 		}
 	}, [handlePixel, ws])
 
+	// Move the canvas to compensate zooming
 	useEffect(() => {
 		const mouse = mouseRef.current
 		const diff = zoom - mouse.zoom
@@ -235,7 +231,6 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 	return (
 		<CanvasContainer
 			onMouseDown={handleMouseDown}
-			onMouseUp={handleMouseUp}
 			onMouseMove={handleMouseMove}
 			onContextMenu={blockContext}
 			style={{

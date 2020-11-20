@@ -1,3 +1,4 @@
+import { useErrorHandler } from '@/context/ErrorHandlerContext'
 import { useRest } from '@/context/RestContext'
 import { setCanvasState } from '@/store/modules/canvas'
 import { setSessionState } from '@/store/modules/session'
@@ -15,12 +16,13 @@ export const LocalStorage = ({}: Props) => {
 
 	const session = useAppStore(state => state.session.id)
 	const selectedColor = useAppStore(state => state.canvas.selectedColor)
+	const { catchErrors } = useErrorHandler()
 
 	useEffect(() => {
 		const sessionStored = localStorage.getItem(SESSION_KEY)
 
 		if (sessionStored) {
-			rest.getSession(sessionStored).then(info => {
+			catchErrors(() => rest.getSession(sessionStored)).then(info => {
 				if (info) {
 					dispatch(
 						setSessionState({

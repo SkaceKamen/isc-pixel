@@ -2,6 +2,7 @@ import { getRestUrl } from '@/api/utils'
 import { Loader } from '@/components'
 import { Kaptcha } from '@/components/Kaptcha/Kaptcha'
 import { Modal } from '@/components/Modal/Modal'
+import { useErrorHandler } from '@/context/ErrorHandlerContext'
 import { useRest } from '@/context/RestContext'
 import { setSessionState } from '@/store/modules/session'
 import { useAppDispatch } from '@/utils/hooks'
@@ -14,14 +15,20 @@ type Props = {
 export const SessionModal = ({ onClose }: Props) => {
 	const rest = useRest()
 	const dispatch = useAppDispatch()
+	const { catchErrors } = useErrorHandler()
 
 	const [loading, setLoading] = useState(false)
 	const [captcha, setCaptcha] = useState(undefined as string | undefined)
 
 	const loadSession = async () => {
 		setLoading(true)
-		const res = await rest.requestSession()
-		setCaptcha(res.captcha)
+
+		const res = await catchErrors(() => rest.requestSession())
+
+		if (res) {
+			setCaptcha(res.captcha)
+		}
+
 		setLoading(false)
 	}
 
@@ -32,12 +39,14 @@ export const SessionModal = ({ onClose }: Props) => {
 
 		setLoading(true)
 
-		const res = await rest.requestSessionFromCaptcha({
-			captcha,
-			results
-		})
+		const res = await catchErrors(() =>
+			rest.requestSessionFromCaptcha({
+				captcha,
+				results
+			})
+		)
 
-		if (res.session && res.pixels !== undefined) {
+		if (res && res.session && res.pixels !== undefined) {
 			dispatch(setSessionState({ id: res.session, pixels: res.pixels }))
 		} else {
 			await loadSession()

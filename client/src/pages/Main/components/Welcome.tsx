@@ -38,7 +38,7 @@ export const Welcome = ({}: Props) => {
 				<Title>How it works?</Title>
 				<p>
 					You can paint whatever you want, but you can only paint one pixel per
-					5 seconds and you can only use predefined set of colors.
+					3 seconds and you can only use predefined set of colors.
 				</p>
 				<Title>Controls</Title>
 				<ul>

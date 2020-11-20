@@ -10,6 +10,8 @@ export class Sessions {
 
 	private _context?: AppContext
 
+	private expiry = hours(1)
+
 	get context() {
 		if (!this._context) {
 			throw new Error('Trying to access context before initialization')
@@ -39,7 +41,7 @@ export class Sessions {
 		const session = {
 			id: uuidv4(),
 			pixels: this.context.config.drawing.pixels,
-			expiresAt: Date.now() + hours(1),
+			expiresAt: Date.now() + this.expiry,
 		}
 
 		await UserSession.create(session)
@@ -51,6 +53,12 @@ export class Sessions {
 		const record = await this.getRecord(id)
 
 		if (record) {
+			if (record.expiresAt.getTime() < Date.now()) {
+				await record.destroy()
+
+				return undefined
+			}
+
 			return userSessionToInfo(record)
 		}
 
@@ -69,7 +77,7 @@ export class Sessions {
 		}
 
 		session.pixels -= 1
-		session.expiresAt = new Date(Date.now() + hours(1))
+		session.expiresAt = new Date(Date.now() + this.expiry)
 
 		if (!session.reloadsAt) {
 			session.reloadsAt = new Date(

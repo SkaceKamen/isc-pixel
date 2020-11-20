@@ -27,8 +27,8 @@ module.exports = {
 		]
 	},
 	drawing: {
-		pixels: 30,
-		timeout: 30,
+		pixels: 1,
+		timeout: 3,
 	},
 	sequelize: {
 		database: 'database',

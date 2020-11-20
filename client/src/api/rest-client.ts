@@ -6,6 +6,18 @@ import {
 	PixelResponse
 } from '@shared/rest'
 
+export class InvalidResponseError extends Error {
+	res: Response
+
+	constructor(res: Response) {
+		super(`Invalid server response: ${res.status} ${res.statusText}`)
+
+		this.res = res
+
+		Object.setPrototypeOf(this, InvalidResponseError.prototype)
+	}
+}
+
 export class RestClient {
 	url: string
 	session?: string
@@ -16,13 +28,11 @@ export class RestClient {
 	}
 
 	async getCanvasInfo() {
-		const res = await fetch(`${this.url}/canvas`)
-
-		return (await res.json()) as CanvasInfo
+		return this.request<CanvasInfo>('/canvas')
 	}
 
 	async putPixel(x: number, y: number, colorIndex: number) {
-		const res = await fetch(`${this.url}/pixel`, {
+		return this.request<PixelResponse>(`/pixel`, {
 			method: 'PUT',
 			headers: {
 				'Content-type': 'application/json',
@@ -30,39 +40,39 @@ export class RestClient {
 			},
 			body: JSON.stringify({ x, y, color: colorIndex })
 		})
-
-		return (await res.json()) as PixelResponse
 	}
 
 	async requestSession() {
-		const res = await fetch(`${this.url}/session`, {
+		return this.request<{ captcha: string }>(`/session`, {
 			method: 'POST'
 		})
-
-		return (await res.json()) as {
-			captcha: string
-		}
 	}
 
 	async requestSessionFromCaptcha(request: CaptchaFinishRequest) {
-		const res = await fetch(`${this.url}/session/captcha`, {
+		return this.request<CaptchaFinishResponse>(`/session/captcha`, {
 			method: 'POST',
 			headers: {
 				'Content-type': 'application/json'
 			},
 			body: JSON.stringify(request)
 		})
-
-		return (await res.json()) as CaptchaFinishResponse
 	}
 
 	async getSession(id: string) {
-		const res = await fetch(`${this.url}/session/${id}`)
-
-		if (!res.ok) {
+		try {
+			return await this.request<UserSessionInfo>(`/session/${id}`)
+		} catch (e) {
 			return undefined
 		}
+	}
 
-		return (await res.json()) as UserSessionInfo
+	protected async request<T>(url: string, init?: RequestInit) {
+		const res = await fetch(`${this.url}${url}`, init)
+
+		if (!res.ok) {
+			throw new InvalidResponseError(res)
+		}
+
+		return (await res.json()) as T
 	}
 }
