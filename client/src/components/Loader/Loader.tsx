@@ -37,7 +37,7 @@ const Container = styled.div<{ absolute: boolean }>`
 			left: 0px;
 			width: 100%;
 			height: 100%;
-			background: rgba(0, 0, 0, 0.8);
+			background: rgba(255, 255, 255, 0.8);
 			display: flex;
 			justify-content: center;
 			align-items: center;
@@ -47,7 +47,7 @@ const Container = styled.div<{ absolute: boolean }>`
 `
 
 const Spinner = styled.div`
-	color: black;
+	color: #eee;
 	text-align: center;
 	position: relative;
 	margin: auto;
@@ -79,8 +79,8 @@ const SpinnerDiv = styled.div<{ rotate: number; delay: number }>`
 		width: 5px;
 		height: 14px;
 		border-radius: 20%;
-		background-color: ${props => props.theme.colors.primary.base};
-		box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.1);
+		background-color: #eee;
+		box-shadow: 0px 0px 5px 0px rgba(200, 200, 200, 0.1);
 	}
 `
 

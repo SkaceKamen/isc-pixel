@@ -6,6 +6,7 @@ import { useAppDispatch, useAppStore, useDocumentEvent } from '@/utils/hooks'
 import { CanvasInfo } from '@shared/rest'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { AppLoader } from '../App/components/AppLoader'
 import { Controls } from './components/Controls/Controls'
 import { PaintCanvas } from './components/PaintCanvas/PaintCanvas'
 import { SessionModal } from './components/SessionModal'
@@ -80,7 +81,7 @@ export const Main = ({}: Props) => {
 					)}
 				</>
 			) : (
-				<Loader loaded={false} />
+				<AppLoader />
 			)}
 		</MainContainer>
 	)
