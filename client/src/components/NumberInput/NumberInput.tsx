@@ -1,10 +1,4 @@
 import { colors } from '@/styles'
-import { IconProp } from '@fortawesome/fontawesome-svg-core'
-import {
-	faChevronLeft,
-	faChevronRight
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { darken, rgba } from 'polished'
 import React from 'react'
 import styled, { css } from 'styled-components'
@@ -15,7 +9,6 @@ type Props = {
 	min?: number
 	max?: number
 	onChange: (v: number) => void
-	icon?: IconProp
 	iconComponent?: React.ReactChild
 	valueComponent?: (value: number) => React.ReactChild
 }
@@ -26,7 +19,6 @@ export const NumberInput = ({
 	onChange,
 	min,
 	max,
-	icon,
 	iconComponent,
 	valueComponent
 }: Props) => {
@@ -52,18 +44,12 @@ export const NumberInput = ({
 					handleChange(value - 1)
 				}}
 			>
-				<FontAwesomeIcon icon={faChevronLeft} />
+				&lt;
 			</ChangeButton>
 			{valueComponent && valueComponent(value)}
 			{!valueComponent && (
-				<Value hasIcon={!!(icon || iconComponent)}>
+				<Value hasIcon={!!iconComponent}>
 					{value}
-
-					{icon && (
-						<Icon>
-							<FontAwesomeIcon icon={icon} />
-						</Icon>
-					)}
 
 					{iconComponent && <Icon>{iconComponent}</Icon>}
 				</Value>
@@ -74,7 +60,7 @@ export const NumberInput = ({
 					handleChange(value + 1)
 				}}
 			>
-				<FontAwesomeIcon icon={faChevronRight} />
+				&gt;
 			</ChangeButton>
 		</E>
 	)

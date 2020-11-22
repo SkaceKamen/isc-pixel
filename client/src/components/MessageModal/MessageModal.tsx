@@ -1,24 +1,10 @@
 import React, { useState } from 'react'
 import { Modal } from '../Modal/Modal'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-	faExclamationTriangle,
-	faInfoCircle,
-	faExclamationCircle,
-	faCheck
-} from '@fortawesome/free-solid-svg-icons'
 import { Button } from '../Button/Button'
 import styled from 'styled-components'
 import { colors } from '@/styles'
 
 type MessageModalType = 'info' | 'warn' | 'error'
-
-const typeToIcon = {
-	info: faInfoCircle,
-	warn: faExclamationTriangle,
-	error: faExclamationCircle,
-	success: faCheck
-} as const
 
 export const MessageModal = ({
 	title,
@@ -40,7 +26,6 @@ export const MessageModal = ({
 		<Modal
 			header={
 				<Header>
-					<FontAwesomeIcon icon={typeToIcon[type]} />
 					<span>{title}</span>
 				</Header>
 			}

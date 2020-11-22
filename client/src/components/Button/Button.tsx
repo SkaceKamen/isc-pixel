@@ -1,6 +1,3 @@
-import { IconProp } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import React, { memo, useMemo } from 'react'
 import { Tooltip } from '@/components/Tooltip/Tooltip'
 import styled, { css } from 'styled-components'
@@ -11,8 +8,6 @@ export type Size = 'xs' | 'sm' | 'md' | 'lg'
 
 interface Props {
 	disabled?: boolean
-	isLoading?: boolean
-	icon?: IconProp
 	schema?: Schema
 	type?: 'button' | 'submit' | 'reset'
 	name?: string
@@ -30,9 +25,7 @@ const ButtonComponent = ({
 	schema,
 	type = 'button',
 	children,
-	icon,
 	onClick,
-	isLoading = false,
 	onMouseOver,
 	onMouseLeave,
 	tooltip,
@@ -40,29 +33,7 @@ const ButtonComponent = ({
 }: Props) => {
 	const hasContent = !!children
 
-	let iconToShow = icon
-
-	if (isLoading) {
-		iconToShow = faSpinner
-	}
-
-	let contents = useMemo(
-		() => (
-			<>
-				{iconToShow && (
-					<Icon
-						isDisabled={disabled || false}
-						hasContent={hasContent}
-						schema={schema || 'primary'}
-					>
-						<FontAwesomeIcon icon={iconToShow} spin={isLoading} />
-					</Icon>
-				)}
-				{children}
-			</>
-		),
-		[children, iconToShow, disabled, hasContent, schema, isLoading]
-	)
+	let contents = children
 
 	if (tooltip) {
 		contents = <Tooltip content={tooltip}>{contents}</Tooltip>
@@ -137,26 +108,6 @@ const Container = styled.button<{
 	> * {
 		margin: 0 0.25rem;
 	}
-`
-
-const Icon = styled.span<{
-	isDisabled: boolean
-	hasContent: boolean
-	schema: Schema
-}>`
-	margin-right: 0.5rem;
-
-	${props =>
-		!props.isDisabled &&
-		css`
-			color: ${props.theme.colors.button[props.schema].color};
-		`}
-
-	${props =>
-		!props.hasContent &&
-		css`
-			margin: 0;
-		`}
 `
 
 export const Button = memo(ButtonComponent)

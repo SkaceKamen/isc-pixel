@@ -1,13 +1,11 @@
 import { colors } from '@/styles'
+import { media } from '@/styles/media'
 import { useWindowEvent } from '@/utils/hooks'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { darken, rgba } from 'polished'
-import React, { useCallback, useEffect, useState } from 'react'
+import { rgba } from 'polished'
+import React, { useCallback, useState } from 'react'
 import ReactDOM from 'react-dom'
 import styled, { css, keyframes, Keyframes } from 'styled-components'
 import { Body, Footer, Header } from './styles'
-import { media } from '@/styles/media'
 
 type RenderCallback = (
 	close: () => void,
@@ -97,9 +95,7 @@ export const Modal = ({
 										? header(handleTameClose, handleClose)
 										: header}
 									{!hideClose && allowClose && (
-										<Close onClick={handleTameClose}>
-											<FontAwesomeIcon icon={faTimes} />
-										</Close>
+										<Close onClick={handleTameClose}>&times;</Close>
 									)}
 								</Header>
 							)}

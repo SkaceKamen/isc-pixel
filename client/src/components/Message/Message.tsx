@@ -1,12 +1,5 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
-import {
-	faInfoCircle,
-	faExclamationTriangle,
-	faExclamationCircle,
-	faCheck
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export type MessageType = 'info' | 'warn' | 'error' | 'success'
 
@@ -16,20 +9,10 @@ type Props = {
 	header?: React.ReactNode
 }
 
-const typeToIcon = {
-	info: faInfoCircle,
-	warn: faExclamationTriangle,
-	error: faExclamationCircle,
-	success: faCheck
-} as const
-
 export const Message = ({ type = 'info', message, header }: Props) => {
 	return (
 		<MessageContainer>
 			<MessageTitle type={type} header={!!header}>
-				<Icon>
-					<FontAwesomeIcon icon={typeToIcon[type]} />
-				</Icon>
 				<span>{header ? header : message}</span>
 			</MessageTitle>
 			{header && <HeaderMessage>{message}</HeaderMessage>}
@@ -69,8 +52,4 @@ const MessageTitle = styled.div<{ type: MessageType; header: boolean }>`
 
 const HeaderMessage = styled.div`
 	padding: 8px;
-`
-
-const Icon = styled.div`
-	padding: 10px;
 `
