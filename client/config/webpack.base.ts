@@ -1,5 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/* eslint-disable @typescript-eslint/triple-slash-reference */
 /// <reference path="./preload-webpack-plugin.d.ts" />
+/// <reference path="./prefresh-webpack.d.ts" />
 
 import webpack from 'webpack'
 import path, { join } from 'path'
@@ -15,6 +16,7 @@ import CircularDependencyPlugin from 'circular-dependency-plugin'
 import TerserPlugin from 'terser-webpack-plugin'
 import PreloadWebpackPlugin from 'preload-webpack-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import PreactRefreshPlugin from '@prefresh/webpack'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require(path.join(__dirname, '..', 'package.json'))
@@ -38,7 +40,7 @@ const config = (env: ENV): webpack.Configuration => {
 			'@babel/react'
 		],
 		plugins: [
-			//...(env === 'development' ? ['react-hot-loader/babel'] : []),
+			'@prefresh/babel-plugin',
 			'@babel/transform-runtime',
 			'babel-plugin-styled-components',
 			[
@@ -66,10 +68,7 @@ const config = (env: ENV): webpack.Configuration => {
 			warnings: true
 		},
 
-		entry: [
-			// ...(env === 'development' ? ['react-hot-loader/patch'] : []),
-			srcPath('index.tsx')
-		],
+		entry: [srcPath('index.tsx')],
 
 		devtool:
 			env === 'development'
@@ -139,7 +138,7 @@ const config = (env: ENV): webpack.Configuration => {
 
 		plugins: [
 			...(env === 'development'
-				? [new webpack.HotModuleReplacementPlugin()]
+				? [new webpack.HotModuleReplacementPlugin(), new PreactRefreshPlugin()]
 				: [new CleanWebpackPlugin()]),
 
 			new webpack.DefinePlugin(getEnvValues(env, pkg.version)),
