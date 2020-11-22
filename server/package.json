@@ -1,12 +1,10 @@
 {
-  "name": "kamenchat-server",
+  "name": "@isc-pixel/server",
   "version": "1.0.0",
-  "description": "",
+  "description": "ISC Pixel express server",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "initialize": "ts-node src/scripts/initialize.ts",
-    "create-user": "ts-node src/scripts/create-user.ts"
+    "start": "ts-node src/index.ts"
   },
   "author": "",
   "license": "ISC",

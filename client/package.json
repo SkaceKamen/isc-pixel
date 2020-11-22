@@ -1,7 +1,7 @@
 {
-  "name": "@open-terraforming/client",
+  "name": "@isc-pixel/client",
   "version": "1.0.0",
-  "description": "Open terraforming game client",
+  "description": "ISC Pixel react client",
   "main": "src/index.ts",
   "scripts": {
     "lint": "eslint \"src/\" --ext .ts,.tsx",
