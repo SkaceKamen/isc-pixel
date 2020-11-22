@@ -38,7 +38,7 @@ const config = (env: ENV): webpack.Configuration => {
 			'@babel/react'
 		],
 		plugins: [
-			...(env === 'development' ? ['react-hot-loader/babel'] : []),
+			//...(env === 'development' ? ['react-hot-loader/babel'] : []),
 			'@babel/transform-runtime',
 			'babel-plugin-styled-components',
 			[
@@ -67,7 +67,7 @@ const config = (env: ENV): webpack.Configuration => {
 		},
 
 		entry: [
-			...(env === 'development' ? ['react-hot-loader/patch'] : []),
+			// ...(env === 'development' ? ['react-hot-loader/patch'] : []),
 			srcPath('index.tsx')
 		],
 
@@ -182,9 +182,12 @@ const config = (env: ENV): webpack.Configuration => {
 			modules: [path.resolve(__dirname, '..', 'node_modules'), 'node_modules'],
 
 			alias: {
-				...(env === 'development'
+				/*...(env === 'development'
 					? { 'react-dom': '@hot-loader/react-dom' }
-					: {}),
+					: {}),*/
+				react: 'preact/compat',
+				'react-dom/test-utils': 'preact/test-utils',
+				'react-dom': 'preact/compat',
 				'@shared': srcPath('../../shared/src'),
 				'@': srcPath()
 			}

@@ -30,4 +30,4 @@ const RootComponent = () => {
 	)
 }
 
-export const Root = hot(RootComponent)
+export const Root = RootComponent
