@@ -39,6 +39,6 @@ module.exports = {
 	},
 	kaptcha: {
 		font1path: __dirname + '/static/fonts/kaptcha.fnt',
-		font2path: __dirname + '/static/fonts/kaptcha-2.fnt',
+		font2path: __dirname + '/static/fonts/kaptcha.fnt',
 	},
 }

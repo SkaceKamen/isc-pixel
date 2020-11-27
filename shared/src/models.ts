@@ -7,8 +7,8 @@ export type Pixel = {
 export type UserSessionInfo = {
 	id: string
 	pixels: number
-	reloadsAt?: number
-	expiresAt: number
+	reloadsIn?: number
+	expiresAt: string
 }
 
 export type ServerInfo = {

@@ -77,9 +77,10 @@ export const WsContextProvider = ({
 					setSessionState({
 						id: session.id,
 						pixels: session.pixels,
-						pixelsReloadAt: session.reloadsAt
-							? new Date(session.reloadsAt)
-							: undefined
+						pixelsReloadAt:
+							session.reloadsIn !== undefined
+								? new Date(Date.now() + session.reloadsIn)
+								: undefined
 					})
 				)
 			})

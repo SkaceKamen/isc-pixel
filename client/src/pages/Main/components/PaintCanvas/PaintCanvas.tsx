@@ -105,8 +105,8 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 						setSessionState({
 							id: res.id,
 							pixels: res.pixels,
-							pixelsReloadAt: res.reloadsAt
-								? new Date(res.reloadsAt)
+							pixelsReloadAt: res.reloadsIn
+								? new Date(Date.now() + res.reloadsIn)
 								: undefined
 						})
 					)

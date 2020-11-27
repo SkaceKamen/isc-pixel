@@ -16,10 +16,13 @@ type Props = {
 export const Cursor = ({ x, y, zoom, tool, mousePos, animation }: Props) => {
 	const colorIndex = useAppStore(state => state.canvas.selectedColor)
 	const palette = useAppStore(state => state.canvas.palette)
+	const pixels = useAppStore(state => state.session.pixels)
+
 	const color = palette[colorIndex]
 
 	return (
 		<ClickPreview
+			canPaint={pixels > 0}
 			style={{
 				transform: `translate(${x}px, ${y}px)`,
 				width: zoom,
@@ -50,13 +53,13 @@ export const Cursor = ({ x, y, zoom, tool, mousePos, animation }: Props) => {
 	)
 }
 
-const ClickPreview = styled.div`
+const ClickPreview = styled.div<{ canPaint: boolean }>`
 	position: absolute;
 	top: 0;
 	left: 0;
 	pointer-events: none;
 	box-sizing: border-box;
-	border: 1px solid #000;
+	border: 1px solid ${props => (props.canPaint ? '#000' : '#666')};
 	pointer-events: none;
 	box-sizing: border-box;
 	user-select: none;

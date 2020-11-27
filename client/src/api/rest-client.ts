@@ -32,7 +32,7 @@ export class RestClient {
 	}
 
 	async putPixel(x: number, y: number, colorIndex: number) {
-		return this.request<PixelResponse>(`/pixel`, {
+		return this.request<UserSessionInfo>(`/pixel`, {
 			method: 'PUT',
 			headers: {
 				'Content-type': 'application/json',

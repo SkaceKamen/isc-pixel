@@ -40,7 +40,7 @@ const config = (env: ENV): webpack.Configuration => {
 			'@babel/react'
 		],
 		plugins: [
-			'@prefresh/babel-plugin',
+			...(env === 'development' ? ['@prefresh/babel-plugin'] : []),
 			'@babel/transform-runtime',
 			'babel-plugin-styled-components',
 			[

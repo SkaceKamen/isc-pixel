@@ -33,7 +33,7 @@ export const Controls = () => {
 
 	const updateReload = () => {
 		const reloadsIn = reloadsAt
-			? Math.max(0, Math.round((reloadsAt.getTime() - Date.now()) / 1000))
+			? Math.max(0, Math.ceil((reloadsAt.getTime() - Date.now()) / 1000))
 			: 0
 
 		setReloadsIn(reloadsIn)
@@ -45,7 +45,7 @@ export const Controls = () => {
 
 	useInterval(() => {
 		updateReload()
-	}, 1000)
+	}, 100)
 
 	return (
 		<C>

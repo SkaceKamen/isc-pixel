@@ -28,8 +28,8 @@ export const LocalStorage = ({}: Props) => {
 						setSessionState({
 							id: sessionStored,
 							pixels: info.pixels,
-							pixelsReloadAt: info.reloadsAt
-								? new Date(info.reloadsAt)
+							pixelsReloadAt: info.reloadsIn
+								? new Date(Date.now() + info.reloadsIn)
 								: undefined
 						})
 					)

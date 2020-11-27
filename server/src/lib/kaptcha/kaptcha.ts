@@ -109,6 +109,8 @@ export class Kaptcha {
 		const font1 = await Jimp.loadFont(this.font1)
 		const font2 = await Jimp.loadFont(this.font2)
 
+		this.random.seed(`${record.seed}${step}-prompt`)
+
 		const font =
 			this.random.get('main-letter-font-prompt') > 0.5 ? font2 : font1
 
@@ -218,7 +220,7 @@ export class Kaptcha {
 
 		const filled = {} as Record<string, number>
 
-		for (let i = 0; i < width / 2; i++) {
+		for (let i = 0; i < width / 2.5; i++) {
 			const letter = letters.charAt(
 				Math.round((letters.length - 1) * this.random.get('letter'))
 			)
@@ -234,7 +236,7 @@ export class Kaptcha {
 				const pos = randomLetterPosition()
 				const posKey = `${Math.floor(pos.x / 32)}-${Math.floor(pos.y / 32)}`
 
-				if ((filled[posKey] ?? 0) < 2) {
+				if ((filled[posKey] ?? 0) < 1) {
 					image.blit(
 						letterImage,
 						pos.x - letterImage.getWidth() / 2,

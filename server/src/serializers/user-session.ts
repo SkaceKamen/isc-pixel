@@ -1,8 +1,14 @@
+import { UserSessionInfo } from '@shared/models'
 import { UserSession } from 'src/models/db/user-session'
 
-export const userSessionToInfo = (userSession: UserSession) => ({
+export const userSessionToInfo = (
+	userSession: UserSession
+): UserSessionInfo => ({
 	id: userSession.id,
-	expiresAt: userSession.expiresAt.getTime(),
+	expiresAt: userSession.expiresAt.toISOString(),
 	pixels: userSession.pixels,
-	reloadsAt: userSession.reloadsAt?.getTime(),
+	reloadsIn:
+		userSession.reloadsAt === undefined
+			? undefined
+			: userSession.reloadsAt?.getTime() - Date.now(),
 })
