@@ -61,7 +61,11 @@ export const useCanvas = (ref: RefObject<HTMLCanvasElement | null>) => {
 					a.href = url
 					document.body.appendChild(a)
 					a.click()
-					document.body.removeChild(a)
+
+					setTimeout(() => {
+						document.body.removeChild(a)
+					})
+
 					resolve()
 				}, 'image/png')
 			}),
