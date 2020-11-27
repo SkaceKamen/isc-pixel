@@ -254,10 +254,13 @@ export const PaintCanvas = ({ info, zoom, onSessionRequested }: Props) => {
 						height: info.height,
 						cursor: dragging ? 'move' : undefined
 					}}
-					onClick={handleClick}
 				>
-					<StyledCanvas className="pixel-perfect" ref={canvasRef} />
-					<SideText />
+					<StyledCanvas
+						className="pixel-perfect"
+						ref={canvasRef}
+						onClick={handleClick}
+					/>
+					<SideText onDownload={canvas.download} />
 				</Scale>
 				<Cursor
 					x={info.width / 2 + (mousePos.x - info.width / 2) * actualZoom}

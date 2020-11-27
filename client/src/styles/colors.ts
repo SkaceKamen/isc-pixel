@@ -3,7 +3,7 @@ import { lighten, darken, rgba } from 'polished'
 const application = '#202020'
 const text = '#fefefe'
 const primary = lighten(0.1, application)
-const secondary = '#265560'
+const secondary = '#000'
 const info = '#265560'
 const success = '#37B479'
 const danger = '#DB433A'
@@ -29,6 +29,16 @@ export default {
 			hover: {
 				background: lighten(0.1, primary),
 				borderColor: lighten(0.1, primary),
+				color: text
+			}
+		},
+		secondary: {
+			background: secondary,
+			borderColor: secondary,
+			color: text,
+			hover: {
+				background: lighten(0.1, secondary),
+				borderColor: lighten(0.1, secondary),
 				color: text
 			}
 		},

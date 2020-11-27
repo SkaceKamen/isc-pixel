@@ -1,8 +1,8 @@
-import React, { memo, useMemo } from 'react'
 import { Tooltip } from '@/components/Tooltip/Tooltip'
+import React, { memo } from 'react'
 import styled, { css } from 'styled-components'
 
-export type Schema = 'primary' | 'transparent'
+export type Schema = 'primary' | 'transparent' | 'secondary'
 
 export type Size = 'xs' | 'sm' | 'md' | 'lg'
 

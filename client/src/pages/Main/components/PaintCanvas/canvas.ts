@@ -29,7 +29,7 @@ export const useCanvas = (ref: RefObject<HTMLCanvasElement | null>) => {
 
 			return index
 		},
-		[ref]
+		[getCtx]
 	)
 
 	const setPixel = useCallback(
@@ -43,11 +43,34 @@ export const useCanvas = (ref: RefObject<HTMLCanvasElement | null>) => {
 			d[3] = 255
 			ctx.putImageData(id, x, y)
 		},
-		[]
+		[getCtx]
+	)
+
+	const download = useCallback(
+		() =>
+			new Promise<void>((resolve, reject) => {
+				if (!ref.current) {
+					reject(new Error('Canvas is not initialized'))
+				}
+
+				ref.current?.toBlob(blob => {
+					const url = URL.createObjectURL(blob)
+					const a = document.createElement('a')
+					a.textContent = 'Download'
+					a.download = 'isc-pixel.png'
+					a.href = url
+					document.body.appendChild(a)
+					a.click()
+					document.body.removeChild(a)
+					resolve()
+				}, 'image/png')
+			}),
+		[ref]
 	)
 
 	return {
 		colorIndexAt,
-		setPixel
+		setPixel,
+		download
 	}
 }
