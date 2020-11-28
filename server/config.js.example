@@ -8,23 +8,23 @@ module.exports = {
 		width: 512,
 		height: 512,
 		palette: [
-			"#FFFFFF"
-			"#E4E4E4"
-			"#888888"
-			"#222222"
-			"#FFA7D1"
-			"#E50000"
-			"#E59500"
-			"#A06A42"
-			"#E5D900"
-			"#94E044"
-			"#02BE01"
-			"#00D3DD"
-			"#0083C7"
-			"#0000EA"
-			"#CF6EE4"
-			"#820080"
-		]
+			'#222222',
+			'#888888',
+			'#E4E4E4',
+			'#FFFFFF',
+			'#FFA7D1',
+			'#E50000',
+			'#E59500',
+			'#A06A42',
+			'#E5D900',
+			'#94E044',
+			'#7AC143',
+			'#00D3DD',
+			'#00AEEF',
+			'#2E3192',
+			'#CF6EE4',
+			'#EC008C',
+		],
 	},
 	drawing: {
 		pixels: 1,
@@ -36,6 +36,7 @@ module.exports = {
 		username: 'root',
 		password: '',
 		storage: 'database.db',
+		logging: false,
 	},
 	kaptcha: {
 		font1path: __dirname + '/static/fonts/kaptcha.fnt',
