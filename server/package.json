@@ -4,7 +4,9 @@
   "description": "ISC Pixel express server",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "cd dist && npx nodemon dist/isc-pixel.js"
   },
   "author": "",
   "license": "ISC",
@@ -45,6 +47,7 @@
     "eslint": "^7.7.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "nodemon": "^2.0.6",
     "prettier": "^2.1.0"
   }
 }
