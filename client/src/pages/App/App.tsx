@@ -8,9 +8,13 @@ import { Main } from '../Main/Main'
 import { ApiErrorMessage } from './components/ApiErrorMessage'
 import { AppLoader } from './components/AppLoader'
 import { LocalStorage } from './components/LocalStorage'
+import { NoConnection } from './components/NoConnection'
 
 export const App = () => {
 	const apiState = useAppStore(state => state.api.state)
+
+	const isConnecting =
+		apiState === ApiState.Reconnecting || apiState === ApiState.Connecting
 
 	return (
 		<AppContainer>
@@ -18,7 +22,11 @@ export const App = () => {
 
 			<LocalStorage />
 
-			{apiState === ApiState.Connected ? <Main /> : <AppLoader />}
+			{apiState !== ApiState.Error && <Main />}
+
+			{apiState === ApiState.Error && <NoConnection />}
+
+			{isConnecting && <AppLoader text="Connecting..." />}
 
 			<ApiErrorMessage />
 		</AppContainer>

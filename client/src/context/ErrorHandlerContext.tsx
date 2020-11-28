@@ -31,6 +31,10 @@ export const ErrorHandlerContextProvider = ({
 
 					return undefined
 				}
+
+				dispatch(setApiError(`${e.res.url}: ${e.message}`))
+
+				return undefined
 			}
 
 			dispatch(setApiError(e.message))

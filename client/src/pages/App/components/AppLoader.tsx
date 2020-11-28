@@ -2,9 +2,11 @@ import React from 'react'
 import styled, { keyframes } from 'styled-components'
 import background from '@/assets/background.png'
 
-type Props = {}
+type Props = {
+	text?: string
+}
 
-export const AppLoader = ({}: Props) => {
+export const AppLoader = ({ text }: Props) => {
 	return (
 		<C>
 			<L>
@@ -24,7 +26,7 @@ export const AppLoader = ({}: Props) => {
 				))}
 			</L>
 
-			<span>Loading ISC Pixel</span>
+			<span>{text ?? 'Loading ISC Pixel'}</span>
 		</C>
 	)
 }
@@ -63,6 +65,7 @@ const C = styled.div`
 	position: fixed;
 	top: 0;
 	left: 0;
+	z-index: 2;
 	background-image: url('${background}');
 	flex-direction: column;
 `

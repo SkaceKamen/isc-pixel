@@ -69,6 +69,8 @@ export const WsContextProvider = ({
 							state: ApiState.Error
 						})
 					)
+
+					setReconnectCount(0)
 				}
 			}
 
