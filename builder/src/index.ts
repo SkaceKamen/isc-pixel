@@ -62,6 +62,11 @@ async function main() {
 		overwrite: true,
 	})
 
+	await copy(
+		join(mods.server, 'config.js.example'),
+		join(outPath, 'config.js.example')
+	)
+
 	console.log('Writing proper package.json')
 
 	const pckData = JSON.parse(
